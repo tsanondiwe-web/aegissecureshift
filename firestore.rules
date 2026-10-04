@@ -1,0 +1,111 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function adminPath() { return /databases/$(database)/documents/admin_users/$(request.auth.uid); }
+    function guardPath() { return /databases/$(database)/documents/guards/$(request.auth.uid); }
+    function hasAdminProfile() { return signedIn() && exists(adminPath()); }
+    function hasGuardProfile() { return signedIn() && exists(guardPath()); }
+    function admin() { return get(adminPath()).data; }
+    function guard() { return get(guardPath()).data; }
+    function isSuperAdmin() { return hasAdminProfile() && admin().role == 'SUPERADMIN' && admin().status == 'ACTIVE'; }
+    function isTenantAdmin() {
+      return hasAdminProfile()
+        && admin().status == 'ACTIVE'
+        && admin().role in ['TENANT_ADMIN', 'DISPATCHER', 'SUPERVISOR'];
+    }
+    function tenantId() {
+      return hasAdminProfile() ? admin().tenantId : (hasGuardProfile() ? guard().tenantId : null);
+    }
+    function sameTenant(data) { return signedIn() && data.tenantId == tenantId(); }
+    function canReadTenant(data) { return isSuperAdmin() || sameTenant(data); }
+    function canManageTenant(data) { return isSuperAdmin() || (isTenantAdmin() && sameTenant(data)); }
+
+    match /admin_users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isSuperAdmin());
+      allow write: if false;
+    }
+
+    match /tenants/{tenant} {
+      allow read: if isSuperAdmin() || (signedIn() && tenant == tenantId());
+      allow create, update: if isSuperAdmin();
+      allow delete: if false;
+    }
+
+    match /guards/{guardId} {
+      allow read: if canReadTenant(resource.data);
+      allow create: if signedIn() && request.auth.uid == guardId && sameTenant(request.resource.data);
+      allow update: if canManageTenant(resource.data)
+        || (signedIn() && request.auth.uid == guardId
+          && request.resource.data.tenantId == resource.data.tenantId);
+      allow delete: if isSuperAdmin();
+    }
+
+    match /sites/{siteId} {
+      allow read: if canReadTenant(resource.data);
+      allow create: if canManageTenant(request.resource.data);
+      allow update, delete: if canManageTenant(resource.data);
+    }
+
+    match /checkpoints/{checkpointId} {
+      allow read: if canReadTenant(resource.data);
+      allow create: if canManageTenant(request.resource.data);
+      allow update, delete: if canManageTenant(resource.data);
+    }
+
+    match /shifts/{shiftId} {
+      allow read: if canReadTenant(resource.data)
+        && (hasAdminProfile() || resource.data.guardId == request.auth.uid);
+      allow create: if canManageTenant(request.resource.data);
+      allow update, delete: if canManageTenant(resource.data);
+    }
+
+    match /incidents/{incidentId} {
+      allow read: if canReadTenant(resource.data);
+      allow create: if sameTenant(request.resource.data)
+        && (hasAdminProfile() || request.resource.data.reportedByGuardId == request.auth.uid);
+      allow update: if canManageTenant(resource.data)
+        || (signedIn() && resource.data.reportedByGuardId == request.auth.uid && sameTenant(resource.data));
+      allow delete: if isSuperAdmin();
+    }
+
+    match /broadcasts/{broadcastId} {
+      allow read: if canReadTenant(resource.data);
+      allow create: if canManageTenant(request.resource.data);
+      allow update: if canManageTenant(resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    match /patrol_tours/{tourId} {
+      allow read: if canReadTenant(resource.data);
+      allow create: if canManageTenant(request.resource.data);
+      allow update, delete: if canManageTenant(resource.data);
+    }
+
+    match /attendance_records/{attendanceId} {
+      allow read: if canReadTenant(resource.data);
+      allow create: if sameTenant(request.resource.data)
+        && (hasAdminProfile() || request.resource.data.guardId == request.auth.uid);
+      allow update: if canManageTenant(resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    match /audit_events/{eventId} {
+      allow read: if canReadTenant(resource.data);
+      allow create: if sameTenant(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    match /clock_in_events/{eventId} {
+      allow read: if canReadTenant(resource.data) && resource.data.guardId == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /checkpoint_scans/{eventId} {
+      allow read: if canReadTenant(resource.data)
+        && (hasAdminProfile() || resource.data.guardId == request.auth.uid);
+      allow write: if false;
+    }
+  }
+}

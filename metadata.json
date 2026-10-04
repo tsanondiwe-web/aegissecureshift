@@ -1,0 +1,6 @@
+{
+  "name": "AegisOps Security Command Center",
+  "description": "Southern Africa enterprise security operations command center supporting South Africa, SADC cross-border facilities, PSIRA compliance, SAPS CAD dispatch, physical QR patrol checkpoints, and multi-tenant guard fleets.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
