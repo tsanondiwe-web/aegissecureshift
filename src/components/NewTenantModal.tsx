@@ -12,7 +12,8 @@ import {
   MapPin,
   Lock,
   Globe,
-  DollarSign
+  DollarSign,
+  Loader2,
 } from 'lucide-react';
 import { Tenant, UserAccount, Site } from '../types';
 import { tacticalAudio } from '../utils/audio';
@@ -20,7 +21,11 @@ import { tacticalAudio } from '../utils/audio';
 interface NewTenantModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddTenant: (tenant: Tenant, admin: UserAccount, primarySite?: Partial<Site>) => void;
+  onAddTenant: (
+    tenant: Tenant,
+    admin: UserAccount,
+    primarySite?: Partial<Site>,
+  ) => Promise<{ tenant: Tenant; admin: UserAccount; invitationEmailSent: boolean }>;
 }
 
 export const NewTenantModal: React.FC<NewTenantModalProps> = ({
@@ -57,8 +62,11 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
   const [createdCredentials, setCreatedCredentials] = useState<{
     tenant: Tenant;
     admin: UserAccount;
+    invitationEmailSent: boolean;
   } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [provisioningError, setProvisioningError] = useState('');
 
   if (!isOpen) return null;
 
@@ -73,7 +81,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
     }
   };
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tenantName.trim() || !adminName.trim() || !adminEmail.trim()) return;
 
@@ -138,8 +146,16 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
       : undefined;
 
     tacticalAudio.playRadioClick();
-    onAddTenant(newTenant, newAdmin, initialSite);
-    setCreatedCredentials({ tenant: newTenant, admin: newAdmin });
+    setSubmitting(true);
+    setProvisioningError('');
+    try {
+      const provisioned = await onAddTenant(newTenant, newAdmin, initialSite);
+      setCreatedCredentials(provisioned);
+    } catch (error) {
+      setProvisioningError(error instanceof Error ? error.message : 'Unable to provision this tenant.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCopyCredentials = () => {
@@ -156,6 +172,8 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
     setSiteAddress('');
     setSiteCity('');
     setCreatedCredentials(null);
+    setProvisioningError('');
+    setSubmitting(false);
     onClose();
   };
 
@@ -225,6 +243,16 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
                 <div className="text-slate-400">Role Assigned:</div>
                 <div className="col-span-2 text-blue-300 font-bold">TENANT_ADMIN (Full Org Control)</div>
               </div>
+            </div>
+
+            <div className={`rounded-xl border p-3 text-xs ${
+              createdCredentials.invitationEmailSent
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                : 'border-amber-200 bg-amber-50 text-amber-900'
+            }`}>
+              {createdCredentials.invitationEmailSent
+                ? 'A secure Firebase password setup email was sent to the tenant administrator.'
+                : 'The account was created, but the password setup email could not be sent. Share the temporary password securely.'}
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
@@ -508,6 +536,11 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
             </div>
 
             {/* Footer Submit */}
+            {provisioningError && (
+              <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+                {provisioningError}
+              </div>
+            )}
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
               <button
                 type="button"
@@ -518,10 +551,11 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 shadow-sm transition-colors"
+                disabled={submitting}
+                className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <Sparkles className="h-4 w-4" />
-                <span>Create Tenant & Provision Admin</span>
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                <span>{submitting ? 'Provisioning securely…' : 'Create Tenant & Provision Admin'}</span>
               </button>
             </div>
           </form>

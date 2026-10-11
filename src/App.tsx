@@ -59,8 +59,8 @@ import {
   subscribeToFirebaseAuditEvents,
   createFirebaseBroadcast,
   logFirebaseQRScan,
-  createFirebaseTenant,
   createFirebaseTenantAdmin,
+  provisionFirebaseTenant,
   getAuthenticatedUserAccount,
   getAccessibleTenants,
   getFirebaseUser,
@@ -75,6 +75,9 @@ import {
   persistFirebaseTour,
   recordFirebaseAuditEvent,
   updateFirebaseTenantRegionalSettings,
+  resetFirebaseUserPassword,
+  setFirebaseUserEnabled,
+  getFirebaseManagedUsers,
 } from './lib/firebase';
 
 const EMPTY_TENANT: Tenant = {
@@ -284,6 +287,12 @@ export default function App() {
     }, tenantScope);
 
     const unsubAuditEvents = subscribeToFirebaseAuditEvents(setAuditEvents, tenantScope);
+    if (currentUser.role === 'SUPERADMIN' || currentUser.role === 'TENANT_ADMIN') {
+      getFirebaseManagedUsers().then((result) => {
+        if (result.success) setUsers(result.users);
+        else console.warn('Unable to load managed users:', result.error);
+      });
+    }
 
     return () => {
       unsubSites();
@@ -836,20 +845,13 @@ export default function App() {
   // ----------------------------------------------------
   // Superadmin Tenant & Tenant Admin Handlers
   // ----------------------------------------------------
-  const handleAddTenant = (
+  const handleAddTenant = async (
     newTenant: Tenant,
     newAdmin: UserAccount,
     primarySitePartial?: Partial<Site>
   ) => {
-    // 1. Add Tenant
-    setTenants((prev) => [newTenant, ...prev]);
-
-    // 2. Add Tenant Admin User
-    setUsers((prev) => [...prev, newAdmin]);
-
-    // 3. Add Primary Operating Facility / Site if configured
-    if (primarySitePartial) {
-      const fullSite: Site = {
+    const fullSite: Site | undefined = primarySitePartial
+      ? {
         id: primarySitePartial.id || `site-${newTenant.id}-1`,
         tenantId: newTenant.id,
         name: primarySitePartial.name || `${newTenant.name} Operating Facility`,
@@ -874,28 +876,36 @@ export default function App() {
         },
         mapCenter: primarySitePartial.mapCenter || { lat: 51.5074, lng: -0.1278 },
         geoMapPos: primarySitePartial.geoMapPos || { x: 50, y: 50 },
-      };
-      setSites((prev) => [fullSite, ...prev]);
-      setCurrentSite(fullSite);
+      }
+      : undefined;
+
+    let provisionedTenant = newTenant;
+    let provisionedAdmin = newAdmin;
+    let invitationEmailSent = false;
+    if (isFirebaseConfigured) {
+      const result = await provisionFirebaseTenant(newTenant, newAdmin, fullSite);
+      if (!result.success) {
+        throw result.error || new Error('Tenant provisioning failed.');
+      }
+      provisionedTenant = result.tenant;
+      provisionedAdmin = result.admin;
+      invitationEmailSent = result.invitationEmailSent;
     }
 
-    // 4. Switch context to the newly created tenant
-    setCurrentTenant(newTenant);
+    setTenants((prev) => [provisionedTenant, ...prev.filter((tenant) => tenant.id !== provisionedTenant.id)]);
+    setUsers((prev) => [provisionedAdmin, ...prev.filter((user) => user.id !== provisionedAdmin.id)]);
 
-    // 5. Persist to Firebase if configured.
-    createFirebaseTenant(newTenant).catch((err) =>
-      console.warn('Firebase tenant insert fallback:', err)
-    );
-    createFirebaseTenantAdmin(newAdmin).catch((err) =>
-      console.warn('Firebase tenant admin insert fallback:', err)
-    );
+    if (fullSite) {
+      setSites((prev) => [fullSite, ...prev.filter((site) => site.id !== fullSite.id)]);
+      setCurrentSite(fullSite);
+    }
+    setCurrentTenant(provisionedTenant);
 
-    // 6. Push System Notification
     const notif: SystemNotification = {
       id: `notif-tenant-${Date.now()}`,
-      tenantId: newTenant.id,
+      tenantId: provisionedTenant.id,
       title: 'Tenant Organization Provisioned',
-      message: `${newTenant.name} (${newTenant.code}) registered with Primary Admin ${newAdmin.name} (${newAdmin.email}).`,
+      message: `${provisionedTenant.name} (${provisionedTenant.code}) registered with Primary Admin ${provisionedAdmin.name} (${provisionedAdmin.email}).${invitationEmailSent ? ' Password setup email sent.' : ''}`,
       type: 'system',
       timestamp: 'Just now',
       read: false,
@@ -903,6 +913,11 @@ export default function App() {
     };
     setNotifications((prev) => [notif, ...prev]);
     tacticalAudio.playDispatchAlert();
+    return {
+      tenant: provisionedTenant,
+      admin: { ...provisionedAdmin, temporaryPassword: newAdmin.temporaryPassword },
+      invitationEmailSent,
+    };
   };
 
   const handleAddAdmin = (newAdmin: UserAccount) => {
@@ -942,6 +957,26 @@ export default function App() {
     };
     setNotifications((prev) => [notif, ...prev]);
     tacticalAudio.playDispatchAlert();
+  };
+
+  const handleResetUserPassword = async (user: UserAccount, newPassword: string) => {
+    const result = await resetFirebaseUserPassword(user.id, newPassword);
+    if (!result.success) {
+      throw result.error || new Error('Unable to change this user password.');
+    }
+    setUsers((current) => current.map((item) => (
+      item.id === user.id ? { ...item, temporaryPassword: undefined } : item
+    )));
+  };
+
+  const handleSetUserEnabled = async (user: UserAccount, enabled: boolean) => {
+    const result = await setFirebaseUserEnabled(user.id, enabled);
+    if (!result.success) {
+      throw result.error || new Error(`Unable to ${enabled ? 'enable' : 'disable'} this user.`);
+    }
+    setUsers((current) => current.map((item) => (
+      item.id === user.id ? { ...item, status: result.status } : item
+    )));
   };
 
   const handleSwitchUser = (user: UserAccount) => {
@@ -1148,6 +1183,8 @@ export default function App() {
               }}
               sites={sites}
               guards={guards}
+              onResetPassword={handleResetUserPassword}
+              onSetUserEnabled={handleSetUserEnabled}
             />
           )}
 

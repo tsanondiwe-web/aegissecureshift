@@ -5,6 +5,7 @@ import {
   User,
   getAuth,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
@@ -268,6 +269,104 @@ export async function createFirebaseTenantAdmin(user: UserAccount) {
     return { success: true as const, user, error: null };
   } catch (error) {
     return { success: false as const, user, error: error as Error };
+  }
+}
+
+export async function provisionFirebaseTenant(
+  tenant: Tenant,
+  admin: UserAccount,
+  primarySite?: Site,
+) {
+  const app = getFirebaseApp();
+  if (!app) {
+    return {
+      success: false as const,
+      tenant,
+      admin,
+      invitationEmailSent: false,
+      error: new Error('Firebase is not configured.'),
+    };
+  }
+  try {
+    const call = httpsCallable<
+      { tenant: Tenant; admin: UserAccount; primarySite?: Site },
+      { tenant: Tenant; admin: UserAccount; primarySiteId: string | null }
+    >(
+      getFunctions(app, (import.meta.env?.VITE_FIREBASE_FUNCTIONS_REGION as string) || 'us-central1'),
+      'provisionTenant',
+    );
+    const result = await call({ tenant, admin, primarySite });
+    let invitationEmailSent = true;
+    try {
+      await sendPasswordResetEmail(getAuth(app), result.data.admin.email);
+    } catch (emailError) {
+      invitationEmailSent = false;
+      console.warn('Tenant created, but the password invitation email could not be sent.', emailError);
+    }
+    return {
+      success: true as const,
+      tenant: result.data.tenant,
+      admin: result.data.admin,
+      invitationEmailSent,
+      error: null,
+    };
+  } catch (error) {
+    return { success: false as const, tenant, admin, invitationEmailSent: false, error: error as Error };
+  }
+}
+
+export async function resetFirebaseUserPassword(targetUserId: string, newPassword: string) {
+  const app = getFirebaseApp();
+  if (!app) return { success: false as const, error: new Error('Firebase is not configured.') };
+  try {
+    const call = httpsCallable<
+      { targetUserId: string; newPassword: string },
+      { success: boolean }
+    >(
+      getFunctions(app, (import.meta.env?.VITE_FIREBASE_FUNCTIONS_REGION as string) || 'us-central1'),
+      'resetUserPassword',
+    );
+    await call({ targetUserId, newPassword });
+    return { success: true as const, error: null };
+  } catch (error) {
+    return { success: false as const, error: error as Error };
+  }
+}
+
+export async function setFirebaseUserEnabled(targetUserId: string, enabled: boolean) {
+  const app = getFirebaseApp();
+  if (!app) return { success: false as const, error: new Error('Firebase is not configured.') };
+  try {
+    const call = httpsCallable<
+      { targetUserId: string; enabled: boolean },
+      { success: boolean; status: UserAccount['status'] }
+    >(
+      getFunctions(app, (import.meta.env?.VITE_FIREBASE_FUNCTIONS_REGION as string) || 'us-central1'),
+      'setUserEnabled',
+    );
+    const result = await call({ targetUserId, enabled });
+    return { success: true as const, status: result.data.status, error: null };
+  } catch (error) {
+    return { success: false as const, error: error as Error };
+  }
+}
+
+export async function getFirebaseManagedUsers() {
+  const app = getFirebaseApp();
+  if (!app) return { success: true as const, users: [] as UserAccount[], error: null };
+  try {
+    const call = httpsCallable<Record<string, never>, { users: UserAccount[] }>(
+      getFunctions(app, (import.meta.env?.VITE_FIREBASE_FUNCTIONS_REGION as string) || 'us-central1'),
+      'listManagedUsers',
+    );
+    const result = await call({});
+    return {
+      success: true as const,
+      users: result.data.users.sort((a, b) => a.name.localeCompare(b.name)),
+      error: null,
+    };
+  } catch (error) {
+    return { success: false as const, users: [] as UserAccount[], error: error as Error };
   }
 }
 

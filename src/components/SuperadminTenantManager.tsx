@@ -16,7 +16,6 @@ import {
   Layers,
   MapPin,
   Lock,
-  Copy,
   Sparkles,
   ChevronRight,
   UserPlus,
@@ -29,6 +28,7 @@ import {
 import { Tenant, UserAccount, Site, Guard, UserRole } from '../types';
 import { tacticalAudio } from '../utils/audio';
 import { formatCurrency, getTenantRegion } from '../utils/regional';
+import { PasswordResetModal } from './PasswordResetModal';
 
 interface SuperadminTenantManagerProps {
   tenants: Tenant[];
@@ -41,6 +41,8 @@ interface SuperadminTenantManagerProps {
   onOpenNewAdminModal: (tenant?: Tenant) => void;
   sites: Site[];
   guards: Guard[];
+  onResetPassword: (user: UserAccount, newPassword: string) => Promise<void>;
+  onSetUserEnabled: (user: UserAccount, enabled: boolean) => Promise<void>;
 }
 
 export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = ({
@@ -54,6 +56,8 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
   onOpenNewAdminModal,
   sites,
   guards,
+  onResetPassword,
+  onSetUserEnabled,
 }) => {
   const isSuperadmin = currentUser.role === 'SUPERADMIN';
   const isTenantAdmin = currentUser.role === 'TENANT_ADMIN' || !isSuperadmin;
@@ -64,11 +68,42 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
   const [searchFilter, setSearchFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
   const [planFilter, setPlanFilter] = useState('ALL');
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [passwordUser, setPasswordUser] = useState<UserAccount | null>(null);
+  const [accessUserId, setAccessUserId] = useState<string | null>(null);
+  const [accessError, setAccessError] = useState('');
+
+  const guardUsers: UserAccount[] = guards.map((guard) => {
+    const accountFields = guard as unknown as {
+      tenantId?: string;
+      tenantName?: string;
+      accountStatus?: UserAccount['status'];
+      createdAt?: string;
+    };
+    const site = sites.find((item) => item.id === guard.siteId);
+    const tenant = tenants.find((item) => item.id === (accountFields.tenantId || site?.tenantId));
+    return {
+      id: guard.id,
+      name: guard.name,
+      email: guard.email,
+      phone: guard.phone,
+      role: 'GUARD',
+      tenantId: accountFields.tenantId || site?.tenantId,
+      tenantName: accountFields.tenantName || tenant?.name,
+      status: accountFields.accountStatus === 'SUSPENDED' ? 'SUSPENDED' : 'ACTIVE',
+      avatar: guard.avatar,
+      createdAt: accountFields.createdAt || '',
+      assignedSiteId: guard.siteId,
+      assignedSiteName: guard.siteName,
+    };
+  });
+  const directoryUsers = [
+    ...users,
+    ...guardUsers.filter((guard) => !users.some((user) => user.id === guard.id)),
+  ];
 
   // Tenant-scoped entities
   const tenantSites = sites.filter((s) => s.tenantId === currentTenant.id);
-  const tenantUsers = users.filter((u) => u.tenantId === currentTenant.id || (!u.tenantId && isSuperadmin));
+  const tenantUsers = directoryUsers.filter((u) => u.tenantId === currentTenant.id || (!u.tenantId && isSuperadmin));
   const tenantGuards = guards.filter((g) => g.siteId && tenantSites.some((s) => s.id === g.siteId));
 
   // Global Multi-Tenant Aggregates
@@ -90,7 +125,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
   ).join(' + ') || '—';
   const totalSitesCount = sites.length;
   const totalGuardsCount = guards.length;
-  const totalAdminsCount = users.filter((u) => u.role === 'TENANT_ADMIN' || u.role === 'SUPERADMIN').length;
+  const totalAdminsCount = directoryUsers.filter((u) => u.role === 'TENANT_ADMIN' || u.role === 'SUPERADMIN').length;
 
   const filteredTenants = tenants.filter((t) => {
     const matchesSearch =
@@ -104,8 +139,8 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
 
   // Filter users based on role scope (if tenant admin, show only their tenant's users)
   const baseUsersList = isTenantAdmin
-    ? users.filter((u) => u.tenantId === currentTenant.id)
-    : users;
+    ? directoryUsers.filter((u) => u.tenantId === currentTenant.id)
+    : directoryUsers;
 
   const filteredUsers = baseUsersList.filter((u) => {
     const matchesSearch =
@@ -117,11 +152,29 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
     return matchesSearch && matchesRole;
   });
 
-  const handleCopyCredentials = (user: UserAccount) => {
-    const text = `=== MONA / AEGIS OPS LOGIN CREDENTIALS ===\nUser: ${user.name}\nEmail: ${user.email}\nTemp Password: ${user.temporaryPassword || 'MonaGuard2026!#'}\nRole: ${user.role}\nOrganization: ${user.tenantName || 'Global Headquarters'}\nURL: ${window.location.origin}`;
-    navigator.clipboard.writeText(text);
-    setCopiedId(user.id);
-    setTimeout(() => setCopiedId(null), 2500);
+  const canResetPassword = (user: UserAccount) => {
+    if (user.id === currentUser.id || user.role === 'SUPERADMIN') return false;
+    if (isSuperadmin) return true;
+    return currentUser.role === 'TENANT_ADMIN'
+      && user.tenantId === currentUser.tenantId
+      && ['DISPATCHER', 'SUPERVISOR', 'GUARD'].includes(user.role);
+  };
+
+  const canManageAccess = (user: UserAccount) => canResetPassword(user);
+
+  const handleAccessChange = async (user: UserAccount) => {
+    const enabling = user.status === 'SUSPENDED';
+    const action = enabling ? 'enable' : 'disable';
+    if (!window.confirm(`${enabling ? 'Enable' : 'Disable'} ${user.name}'s SecureShift access?`)) return;
+    setAccessError('');
+    setAccessUserId(user.id);
+    try {
+      await onSetUserEnabled(user, enabling);
+    } catch (error) {
+      setAccessError(error instanceof Error ? error.message : `Unable to ${action} this user.`);
+    } finally {
+      setAccessUserId(null);
+    }
   };
 
   return (
@@ -302,7 +355,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
           >
             <Users className="h-4 w-4" />
             <span>
-              {isSuperadmin ? `All Users & Admins Directory (${users.length})` : `Staff & Users (${tenantUsers.length})`}
+              {isSuperadmin ? `All Users & Admins Directory (${directoryUsers.length})` : `Staff & Users (${tenantUsers.length})`}
             </span>
           </button>
 
@@ -355,10 +408,10 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
               const sitesList = sites.filter((s) => s.tenantId === t.id);
               const guardsList = guards.filter((g) => g.siteId && sitesList.some((s) => s.id === g.siteId));
               const isCurrent = t.id === currentTenant.id;
-              const adminUser = users.find(
+              const adminUser = directoryUsers.find(
                 (u) => u.id === t.primaryAdminId || (u.tenantId === t.id && u.role === 'TENANT_ADMIN')
               );
-              const tenantUsersCount = users.filter((u) => u.tenantId === t.id).length;
+              const tenantUsersCount = directoryUsers.filter((u) => u.tenantId === t.id).length;
 
               return (
                 <div
@@ -422,19 +475,13 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                         <Users className="h-3.5 w-3.5" />
                         PRIMARY TENANT ADMINISTRATOR
                       </span>
-                      {adminUser && (
+                      {adminUser && canResetPassword(adminUser) && (
                         <button
-                          onClick={() => handleCopyCredentials(adminUser)}
-                          className="text-[10px] text-blue-600 hover:text-blue-800 font-mono font-bold flex items-center gap-1"
+                          onClick={() => setPasswordUser(adminUser)}
+                          className="text-[10px] text-slate-700 hover:text-slate-950 font-mono font-bold flex items-center gap-1"
                         >
-                          {copiedId === adminUser.id ? (
-                            <span className="text-emerald-600">✓ Copied</span>
-                          ) : (
-                            <>
-                              <Copy className="h-3 w-3" />
-                              <span>Copy Credentials</span>
-                            </>
-                          )}
+                          <Key className="h-3 w-3" />
+                          <span>Change Password</span>
                         </button>
                       )}
                     </div>
@@ -513,6 +560,12 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
             </button>
           </div>
 
+          {accessError && (
+            <div className="mx-4 mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-800">
+              {accessError}
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="border-b border-slate-200 bg-slate-50 font-mono text-[11px] text-slate-600">
@@ -581,8 +634,12 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                       </td>
 
                       <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-mono font-bold text-emerald-700 border border-emerald-200">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-mono font-bold border ${
+                          u.status === 'SUSPENDED'
+                            ? 'bg-slate-100 text-slate-700 border-slate-300'
+                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        }`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${u.status === 'SUSPENDED' ? 'bg-slate-500' : 'bg-emerald-500'}`}></span>
                           {u.status}
                         </span>
                       </td>
@@ -593,13 +650,30 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
 
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleCopyCredentials(u)}
-                            className="rounded border border-slate-200 bg-white hover:bg-slate-50 px-2 py-1 text-[11px] font-bold text-slate-700"
-                            title="Copy login email & temporary password"
-                          >
-                            {copiedId === u.id ? '✓ Copied' : 'Copy Logins'}
-                          </button>
+                          {canResetPassword(u) && (
+                            <button
+                              onClick={() => setPasswordUser(u)}
+                              className="rounded border border-slate-300 bg-white hover:bg-slate-50 px-2 py-1 text-[11px] font-bold text-slate-800"
+                              title="Change this user's Firebase login password"
+                            >
+                              Change Password
+                            </button>
+                          )}
+
+                          {canManageAccess(u) && (
+                            <button
+                              onClick={() => void handleAccessChange(u)}
+                              disabled={accessUserId === u.id}
+                              className={`rounded border px-2 py-1 text-[11px] font-bold disabled:cursor-wait disabled:opacity-60 ${
+                                u.status === 'SUSPENDED'
+                                  ? 'border-slate-900 bg-slate-900 text-white hover:bg-slate-800'
+                                  : 'border-red-300 bg-white text-red-700 hover:bg-red-50'
+                              }`}
+                              title={u.status === 'SUSPENDED' ? 'Restore this user login' : 'Block this user login and revoke sessions'}
+                            >
+                              {accessUserId === u.id ? 'Updating…' : u.status === 'SUSPENDED' ? 'Enable' : 'Disable'}
+                            </button>
+                          )}
 
                           <button
                             onClick={() => {
@@ -694,6 +768,14 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
             </div>
           </div>
         </div>
+      )}
+
+      {passwordUser && (
+        <PasswordResetModal
+          user={passwordUser}
+          onClose={() => setPasswordUser(null)}
+          onReset={onResetPassword}
+        />
       )}
     </div>
   );
