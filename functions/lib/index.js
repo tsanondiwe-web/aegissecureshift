@@ -247,34 +247,88 @@ exports.provisionTenant = (0, https_1.onCall)(async (request) => {
         throw new https_1.HttpsError('internal', 'Tenant provisioning failed. No tenant was created.');
     }
 });
+const ordinaryUserRoles = new Set(['DISPATCHER', 'SUPERVISOR', 'GUARD']);
 exports.createTenantAdmin = (0, https_1.onCall)(async (request) => {
     if (!request.auth)
         throw new https_1.HttpsError('unauthenticated', 'Sign in first.');
-    const caller = await db.collection('admin_users').doc(request.auth.uid).get();
-    if (!caller.exists || caller.data()?.role !== 'SUPERADMIN' || caller.data()?.status !== 'ACTIVE') {
-        throw new https_1.HttpsError('permission-denied', 'Only an active superadmin can create tenant administrators.');
+    const callerSnapshot = await db.collection('admin_users').doc(request.auth.uid).get();
+    const caller = callerSnapshot.data();
+    if (!callerSnapshot.exists || caller?.status !== 'ACTIVE') {
+        throw new https_1.HttpsError('permission-denied', 'Only an active administrator can create users.');
     }
     const user = request.data.user;
-    if (!user.email || !user.temporaryPassword) {
-        throw new https_1.HttpsError('invalid-argument', 'Email and temporary password are required.');
+    if (!user.email || !user.temporaryPassword || !user.name || !user.tenantId) {
+        throw new https_1.HttpsError('invalid-argument', 'Name, tenant, email, and temporary password are required.');
     }
-    const created = await (0, auth_1.getAuth)().createUser({
-        email: user.email,
-        password: user.temporaryPassword,
-        displayName: user.name,
-    });
-    const collectionName = user.role === 'GUARD' ? 'guards' : 'admin_users';
-    const { temporaryPassword: _temporaryPassword, ...safeProfile } = user;
-    await db.collection(collectionName).doc(created.uid).set({
-        ...safeProfile,
-        id: created.uid,
-        status: user.role === 'GUARD' ? 'offline' : user.status,
-        accountStatus: user.status,
-        createdAt: new Date().toISOString(),
-    });
-    return { uid: created.uid };
+    validatePassword(user.temporaryPassword);
+    const callerRole = caller.role;
+    const callerTenantId = caller.tenantId;
+    const tenantAdminMayCreate = callerRole === 'TENANT_ADMIN'
+        && ordinaryUserRoles.has(user.role)
+        && Boolean(callerTenantId)
+        && callerTenantId === user.tenantId;
+    const superadminMayCreate = callerRole === 'SUPERADMIN' && user.role !== 'SUPERADMIN';
+    if (!tenantAdminMayCreate && !superadminMayCreate) {
+        throw new https_1.HttpsError('permission-denied', user.role === 'TENANT_ADMIN'
+            ? 'Only a superadmin can create tenant administrators.'
+            : 'Tenant administrators may create only ordinary users in their own tenant.');
+    }
+    let createdUserId = null;
+    try {
+        const normalizedEmail = user.email.trim().toLowerCase();
+        const created = await (0, auth_1.getAuth)().createUser({
+            email: normalizedEmail,
+            password: user.temporaryPassword,
+            displayName: user.name.trim(),
+        });
+        createdUserId = created.uid;
+        const collectionName = user.role === 'GUARD' ? 'guards' : 'admin_users';
+        const { temporaryPassword: _temporaryPassword, ...safeProfile } = user;
+        const createdAt = new Date().toISOString();
+        const storedProfile = {
+            ...safeProfile,
+            id: created.uid,
+            name: user.name.trim(),
+            email: normalizedEmail,
+            status: user.role === 'GUARD' ? 'offline' : 'ACTIVE',
+            accountStatus: 'ACTIVE',
+            createdAt,
+            updatedAt: createdAt,
+        };
+        const profileRef = db.collection(collectionName).doc(created.uid);
+        const auditRef = db.collection('audit_events').doc();
+        const batch = db.batch();
+        batch.create(profileRef, storedProfile);
+        batch.create(auditRef, {
+            tenantId: user.tenantId,
+            actorUserId: request.auth.uid,
+            actorName: caller.name || request.auth.token.email || 'Administrator',
+            actorRole: callerRole,
+            action: 'USER_PROVISIONED',
+            entityType: 'user',
+            entityId: created.uid,
+            details: { targetRole: user.role, targetEmail: normalizedEmail },
+            occurredAt: createdAt,
+            createdAt: firestore_1.FieldValue.serverTimestamp(),
+        });
+        await batch.commit();
+        return {
+            uid: created.uid,
+            user: { ...safeProfile, id: created.uid, name: user.name.trim(), email: normalizedEmail, status: 'ACTIVE', createdAt },
+        };
+    }
+    catch (error) {
+        if (createdUserId) {
+            await (0, auth_1.getAuth)().deleteUser(createdUserId).catch((rollbackError) => {
+                console.error('Unable to roll back provisioned user', rollbackError);
+            });
+        }
+        if (error instanceof https_1.HttpsError)
+            throw error;
+        console.error('User provisioning failed', error);
+        throw new https_1.HttpsError('internal', 'User provisioning failed. No account was created.');
+    }
 });
-const ordinaryUserRoles = new Set(['DISPATCHER', 'SUPERVISOR', 'GUARD']);
 function validatePassword(password) {
     if (password.length < 12
         || !/[a-z]/.test(password)

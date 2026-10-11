@@ -22,7 +22,7 @@ interface NewTenantAdminModalProps {
   onClose: () => void;
   tenants: Tenant[];
   selectedTenant?: Tenant;
-  onAddAdmin: (admin: UserAccount) => void;
+  onAddAdmin: (admin: UserAccount) => Promise<UserAccount>;
   currentUser?: UserAccount;
   sites?: Site[];
 }
@@ -52,6 +52,8 @@ export const NewTenantAdminModal: React.FC<NewTenantAdminModalProps> = ({
 
   const [createdUser, setCreatedUser] = useState<UserAccount | null>(null);
   const [copied, setCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [provisioningError, setProvisioningError] = useState('');
 
   // Sync targetTenantId when modal opens or selectedTenant changes
   useEffect(() => {
@@ -68,6 +70,8 @@ export const NewTenantAdminModal: React.FC<NewTenantAdminModalProps> = ({
       setAssignedSiteId('ALL');
       setCreatedUser(null);
       setCopied(false);
+      setSubmitting(false);
+      setProvisioningError('');
     }
   }, [isOpen, selectedTenant, currentUser, isTenantAdminOnly, tenants]);
 
@@ -77,7 +81,7 @@ export const NewTenantAdminModal: React.FC<NewTenantAdminModalProps> = ({
   const tenantSites = sites.filter((s) => s.tenantId === currentTenant?.id);
   const selectedSite = tenantSites.find((s) => s.id === assignedSiteId);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !currentTenant) return;
 
@@ -108,8 +112,16 @@ export const NewTenantAdminModal: React.FC<NewTenantAdminModalProps> = ({
     };
 
     tacticalAudio.playRadioClick();
-    onAddAdmin(newUser);
-    setCreatedUser(newUser);
+    setSubmitting(true);
+    setProvisioningError('');
+    try {
+      const provisionedUser = await onAddAdmin(newUser);
+      setCreatedUser(provisionedUser);
+    } catch (error) {
+      setProvisioningError(error instanceof Error ? error.message : 'Unable to provision this user.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCopy = () => {
@@ -405,6 +417,12 @@ export const NewTenantAdminModal: React.FC<NewTenantAdminModalProps> = ({
               </p>
             </div>
 
+            {provisioningError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs font-medium text-red-800">
+                {provisioningError}
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
               <button
@@ -417,9 +435,10 @@ export const NewTenantAdminModal: React.FC<NewTenantAdminModalProps> = ({
               <button
                 type="submit"
                 id="btn-submit-new-user"
-                className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 shadow-sm transition-colors"
+                disabled={submitting}
+                className="rounded-xl bg-blue-600 px-5 py-2 text-xs font-bold text-white hover:bg-blue-700 shadow-sm transition-colors disabled:cursor-wait disabled:opacity-60"
               >
-                Provision User Account
+                {submitting ? 'Provisioning…' : 'Provision User Account'}
               </button>
             </div>
           </form>

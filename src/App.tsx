@@ -920,36 +920,39 @@ export default function App() {
     };
   };
 
-  const handleAddAdmin = (newAdmin: UserAccount) => {
-    // 1. Add User to state
-    setUsers((prev) => [...prev, newAdmin]);
+  const handleAddAdmin = async (newAdmin: UserAccount) => {
+    let provisionedUser = newAdmin;
+    if (isFirebaseConfigured) {
+      const result = await createFirebaseTenantAdmin(newAdmin);
+      if (!result.success) {
+        throw result.error || new Error('User provisioning failed.');
+      }
+      provisionedUser = result.user;
+    }
+
+    const safeUser = { ...provisionedUser, temporaryPassword: undefined };
+    setUsers((prev) => [...prev.filter((user) => user.id !== safeUser.id), safeUser]);
 
     // 2. Update tenant's primaryAdmin fields if not present
     setTenants((prev) =>
       prev.map((t) => {
-        if (t.id === newAdmin.tenantId && !t.primaryAdminName) {
+        if (t.id === provisionedUser.tenantId && !t.primaryAdminName) {
           return {
             ...t,
-            primaryAdminId: newAdmin.id,
-            primaryAdminName: newAdmin.name,
-            primaryAdminEmail: newAdmin.email,
+            primaryAdminId: provisionedUser.id,
+            primaryAdminName: provisionedUser.name,
+            primaryAdminEmail: provisionedUser.email,
           };
         }
         return t;
       })
     );
 
-    // 3. Persist to Firebase.
-    createFirebaseTenantAdmin(newAdmin).catch((err) =>
-      console.warn('Firebase admin insert fallback:', err)
-    );
-
-    // 4. Push System Notification
     const notif: SystemNotification = {
       id: `notif-admin-${Date.now()}`,
-      tenantId: newAdmin.tenantId || currentTenant.id,
-      title: 'Tenant Administrator Provisioned',
-      message: `Assigned ${newAdmin.name} (${newAdmin.role}) to ${newAdmin.tenantName || 'Tenant Org'}.`,
+      tenantId: provisionedUser.tenantId || currentTenant.id,
+      title: 'User Account Provisioned',
+      message: `Assigned ${provisionedUser.name} (${provisionedUser.role}) to ${provisionedUser.tenantName || 'Tenant Org'}.`,
       type: 'system',
       timestamp: 'Just now',
       read: false,
@@ -957,6 +960,7 @@ export default function App() {
     };
     setNotifications((prev) => [notif, ...prev]);
     tacticalAudio.playDispatchAlert();
+    return { ...safeUser, temporaryPassword: newAdmin.temporaryPassword };
   };
 
   const handleResetUserPassword = async (user: UserAccount, newPassword: string) => {

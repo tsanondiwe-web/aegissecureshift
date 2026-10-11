@@ -261,12 +261,12 @@ export async function createFirebaseTenantAdmin(user: UserAccount) {
   const app = getFirebaseApp();
   if (!app) return { success: false as const, user, error: new Error('Firebase is not configured.') };
   try {
-    const call = httpsCallable<{ user: UserAccount }, { uid: string }>(
+    const call = httpsCallable<{ user: UserAccount }, { uid: string; user: UserAccount }>(
       getFunctions(app, (import.meta.env?.VITE_FIREBASE_FUNCTIONS_REGION as string) || 'us-central1'),
       'createTenantAdmin',
     );
-    await call({ user });
-    return { success: true as const, user, error: null };
+    const result = await call({ user });
+    return { success: true as const, user: result.data.user, error: null };
   } catch (error) {
     return { success: false as const, user, error: error as Error };
   }
