@@ -983,17 +983,6 @@ export default function App() {
     )));
   };
 
-  const handleSwitchUser = (user: UserAccount) => {
-    if (isFirebaseConfigured) return;
-    setCurrentUser(user);
-    if (user.tenantId) {
-      const matchTenant = tenants.find((t) => t.id === user.tenantId);
-      if (matchTenant) {
-        handleSelectTenant(matchTenant);
-      }
-    }
-  };
-
   const handleUpdateRegionalSettings = async (value: RegionalSettingsValue) => {
     const persisted = await updateFirebaseTenantRegionalSettings(currentTenant.id, value);
     if (!persisted.success) {
@@ -1064,8 +1053,6 @@ export default function App() {
         setSearchQuery={setSearchQuery}
         firebaseConnected={firebaseLive}
         currentUser={currentUser}
-        users={isFirebaseConfigured ? [] : users}
-        onSwitchUser={isFirebaseConfigured ? undefined : handleSwitchUser}
         onSignOut={isFirebaseConfigured ? signOutOfFirebase : undefined}
         onOpenNewTenantModal={isSuperadmin ? () => setIsNewTenantModalOpen(true) : undefined}
         onUpdateRegionalSettings={
@@ -1089,7 +1076,6 @@ export default function App() {
           tourComplianceAvg={tourComplianceAvg}
           tenantsCount={visibleTenants.length}
           currentUser={currentUser}
-          onSwitchUser={isFirebaseConfigured ? undefined : handleSwitchUser}
           onSignOut={isFirebaseConfigured ? signOutOfFirebase : undefined}
           users={isFirebaseConfigured ? [] : users}
         />
@@ -1179,7 +1165,6 @@ export default function App() {
               onSelectTenant={handleSelectTenant}
               users={isSuperadmin ? users : users.filter((user) => user.tenantId === currentTenant.id)}
               currentUser={currentUser}
-              onSwitchUser={handleSwitchUser}
               onOpenNewTenantModal={() => setIsNewTenantModalOpen(true)}
               onOpenNewAdminModal={(tenant) => {
                 setSelectedTenantForNewAdmin(tenant);

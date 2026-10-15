@@ -42,8 +42,6 @@ interface HeaderProps {
   setSearchQuery: (query: string) => void;
   firebaseConnected?: boolean;
   currentUser?: UserAccount;
-  users?: UserAccount[];
-  onSwitchUser?: (user: UserAccount) => void;
   onSignOut?: () => void | Promise<unknown>;
   onOpenNewTenantModal?: () => void;
   onUpdateRegionalSettings?: (value: RegionalSettingsValue) => void | Promise<void>;
@@ -64,8 +62,6 @@ export const Header: React.FC<HeaderProps> = ({
   setSearchQuery,
   firebaseConnected = false,
   currentUser,
-  users = [],
-  onSwitchUser,
   onSignOut,
   onOpenNewTenantModal,
   onUpdateRegionalSettings,
@@ -387,43 +383,6 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                 </div>
 
-                {users.length > 0 && onSwitchUser && (
-                  <div className="mt-2">
-                    <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
-                      Switch User Account
-                    </div>
-                    <div className="max-h-48 overflow-y-auto space-y-1 mt-1">
-                      {users.map((u) => (
-                        <button
-                          key={u.id}
-                          onClick={() => {
-                            onSwitchUser(u);
-                            setShowUserDropdown(false);
-                            tacticalAudio.playRadioClick();
-                          }}
-                          className={`flex w-full items-center justify-between rounded-lg p-2 text-left text-xs transition-colors ${
-                            u.id === currentUser.id
-                              ? 'bg-blue-50 text-blue-900 border border-blue-200 font-medium'
-                              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span>{u.role === 'SUPERADMIN' ? '👑' : u.avatar || '👤'}</span>
-                            <div>
-                              <div className="font-semibold text-slate-900">{u.name}</div>
-                              <div className="text-[10px] text-slate-500 font-mono">
-                                {u.role === 'SUPERADMIN' ? 'Global Superadmin' : u.tenantName || 'Tenant Admin'}
-                              </div>
-                            </div>
-                          </div>
-                          {u.id === currentUser.id && (
-                            <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
                 {onSignOut && (
                   <button
                     onClick={() => {

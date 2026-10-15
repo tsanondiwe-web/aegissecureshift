@@ -27,7 +27,6 @@ interface SidebarProps {
   tourComplianceAvg: number;
   tenantsCount?: number;
   currentUser?: UserAccount;
-  onSwitchUser?: (user: UserAccount) => void;
   onSignOut?: () => void | Promise<unknown>;
   users?: UserAccount[];
 }
@@ -43,7 +42,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   tourComplianceAvg,
   tenantsCount = 4,
   currentUser,
-  onSwitchUser,
   onSignOut,
   users = [],
 }) => {
@@ -224,19 +222,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {!collapsed && (
+          {!collapsed && onSignOut && (
             <button
               id="sidebar-logout-btn"
               onClick={() => {
                 if (onSignOut) {
                   void onSignOut();
-                } else if (users.length > 1 && onSwitchUser && currentUser) {
-                  // Rotate to next available user account or superadmin
-                  const nextUser = users.find((u) => u.id !== currentUser.id) || users[0];
-                  onSwitchUser(nextUser);
                 }
               }}
-              title="Switch Account / Log Out"
+              title="Sign out"
               className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-200 hover:text-slate-900 transition-colors"
             >
               <LogOut className="h-4 w-4" />

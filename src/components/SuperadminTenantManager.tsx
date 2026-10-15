@@ -36,7 +36,6 @@ interface SuperadminTenantManagerProps {
   onSelectTenant: (tenant: Tenant) => void;
   users: UserAccount[];
   currentUser: UserAccount;
-  onSwitchUser: (user: UserAccount) => void;
   onOpenNewTenantModal: () => void;
   onOpenNewAdminModal: (tenant?: Tenant) => void;
   sites: Site[];
@@ -51,7 +50,6 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
   onSelectTenant,
   users,
   currentUser,
-  onSwitchUser,
   onOpenNewTenantModal,
   onOpenNewAdminModal,
   sites,
@@ -62,7 +60,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
   const isSuperadmin = currentUser.role === 'SUPERADMIN';
   const isTenantAdmin = currentUser.role === 'TENANT_ADMIN' || !isSuperadmin;
 
-  const [activeSubTab, setActiveSubTab] = useState<'tenants' | 'admins' | 'simulation'>(
+  const [activeSubTab, setActiveSubTab] = useState<'tenants' | 'admins'>(
     isSuperadmin ? 'tenants' : 'admins'
   );
   const [searchFilter, setSearchFilter] = useState('');
@@ -359,17 +357,6 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
             </span>
           </button>
 
-          <button
-            onClick={() => setActiveSubTab('simulation')}
-            className={`flex items-center gap-2 border-b-2 px-3 py-2 text-xs font-bold transition-colors ${
-              activeSubTab === 'simulation'
-                ? 'border-blue-600 text-blue-900'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <Crown className="h-4 w-4 text-amber-600" />
-            <span>Role & Account Switcher</span>
-          </button>
         </div>
 
         {/* Search & Role Filter Controls */}
@@ -675,19 +662,6 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                             </button>
                           )}
 
-                          <button
-                            onClick={() => {
-                              onSwitchUser(u);
-                              tacticalAudio.playRadioClick();
-                            }}
-                            className={`rounded px-2.5 py-1 text-[11px] font-bold ${
-                              isCurrent
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-slate-900 text-white hover:bg-slate-800'
-                            }`}
-                          >
-                            {isCurrent ? 'Active' : 'Log in as'}
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -695,77 +669,6 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                 })}
               </tbody>
             </table>
-          </div>
-        </div>
-      )}
-
-      {/* Sub-Tab 3: Role & Scope Simulation */}
-      {activeSubTab === 'simulation' && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
-          <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
-              <Crown className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900">Role-Based Access & Tenant Scoping Simulator</h3>
-              <p className="text-xs text-slate-500 font-mono">
-                Switch between Superadmin and Tenant Administrator accounts to inspect view restrictions
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            {/* Superadmin Card */}
-            <div className="rounded-xl border border-amber-200 bg-amber-50/40 p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-amber-950 text-sm flex items-center gap-1.5">
-                  <Crown className="h-4 w-4 text-amber-700" />
-                  👑 Global Superadmin
-                </span>
-                <span className="text-[10px] font-mono bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-bold">
-                  UNRESTRICTED
-                </span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Full authority across all client organizations. Can register new tenants, create admin accounts, inspect global telemetry, and access multi-tenant billing.
-              </p>
-              <button
-                onClick={() => {
-                  const superAdmin = users.find((u) => u.role === 'SUPERADMIN') || users[0];
-                  onSwitchUser(superAdmin);
-                }}
-                className="w-full rounded-lg bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 text-xs transition-colors"
-              >
-                Switch to Global Superadmin Profile
-              </button>
-            </div>
-
-            {/* Tenant Admin Card */}
-            <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-4 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-blue-950 text-sm flex items-center gap-1.5">
-                  <Building2 className="h-4 w-4 text-blue-700" />
-                  🏢 Tenant Administrator
-                </span>
-                <span className="text-[10px] font-mono bg-blue-200 text-blue-900 px-2 py-0.5 rounded font-bold">
-                  SCOPED TO TENANT
-                </span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Manages guard rosters, checkpoints, schedules, and adds staff & user accounts strictly for their assigned organization: <strong className="text-slate-900">{currentTenant.name}</strong>.
-              </p>
-              <button
-                onClick={() => {
-                  const tenantAdmin = users.find(
-                    (u) => u.tenantId === currentTenant.id && u.role === 'TENANT_ADMIN'
-                  ) || users[1];
-                  if (tenantAdmin) onSwitchUser(tenantAdmin);
-                }}
-                className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 text-xs transition-colors"
-              >
-                Switch to {currentTenant.code} Tenant Admin Profile
-              </button>
-            </div>
           </div>
         </div>
       )}
