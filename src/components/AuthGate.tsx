@@ -17,35 +17,38 @@ export const AuthGate: React.FC<AuthGateProps> = ({ loading, accessError }) => {
     event.preventDefault();
     setSubmitting(true);
     setError('');
-    const result = await signInToFirebase(email.trim(), password);
-    if (!result.success) {
-      setError(result.error?.message || 'Unable to authenticate this account.');
+    try {
+      const result = await signInToFirebase(email.trim(), password);
+      if (!result.success) setError(result.error?.message || 'Unable to authenticate this account.');
+    } catch {
+      setError('Unable to sign in. Check your connection and try again.');
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   return (
-    <main className="min-h-screen bg-[#071321] text-slate-100 flex items-center justify-center p-5">
-      <section className="w-full max-w-md rounded-2xl border border-slate-700/70 bg-[#0B1E33] p-6 shadow-2xl">
+    <main className="min-h-screen bg-stone-50 text-slate-900 flex items-center justify-center p-5">
+      <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/30 bg-blue-500/10">
-            <ShieldCheck className="h-6 w-6 text-blue-300" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-stone-50">
+            <ShieldCheck className="h-6 w-6 text-slate-600" />
           </div>
           <div>
             <h1 className="text-lg font-bold">AegisOps Secure Access</h1>
-            <p className="text-xs font-mono text-slate-400">AUTHENTICATED SECURITY OPERATIONS CONSOLE</p>
+            <p className="text-xs font-mono text-slate-500">AUTHENTICATED SECURITY OPERATIONS CONSOLE</p>
           </div>
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-12 text-sm text-slate-300">
+          <div className="flex items-center justify-center gap-2 py-12 text-sm text-slate-600">
             <Loader2 className="h-4 w-4 animate-spin" />
             Verifying secure session…
           </div>
         ) : (
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="auth-email" className="mb-1.5 block text-xs font-semibold text-slate-300">Email address</label>
+              <label htmlFor="auth-email" className="mb-1.5 block text-xs font-semibold text-slate-600">Email address</label>
               <input
                 id="auth-email"
                 type="email"
@@ -53,11 +56,11 @@ export const AuthGate: React.FC<AuthGateProps> = ({ loading, accessError }) => {
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-lg border border-slate-600 bg-slate-950/40 px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
               />
             </div>
             <div>
-              <label htmlFor="auth-password" className="mb-1.5 block text-xs font-semibold text-slate-300">Password</label>
+              <label htmlFor="auth-password" className="mb-1.5 block text-xs font-semibold text-slate-600">Password</label>
               <input
                 id="auth-password"
                 type="password"
@@ -65,12 +68,12 @@ export const AuthGate: React.FC<AuthGateProps> = ({ loading, accessError }) => {
                 required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="w-full rounded-lg border border-slate-600 bg-slate-950/40 px-3 py-2.5 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
               />
             </div>
 
             {(error || accessError) && (
-              <div role="alert" className="flex gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-100">
+              <div role="alert" className="flex gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>{error || accessError}</span>
               </div>
@@ -79,7 +82,7 @@ export const AuthGate: React.FC<AuthGateProps> = ({ loading, accessError }) => {
             <button
               type="submit"
               disabled={submitting}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-white px-4 py-2.5 text-sm font-bold hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LockKeyhole className="h-4 w-4" />}
               Sign in to command centre

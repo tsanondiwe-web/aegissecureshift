@@ -84,7 +84,7 @@ export const SOSAlarmHUD: React.FC<SOSAlarmHUDProps> = ({
                 <strong className="text-slate-800">Distress Officer:</strong> {incident.reportedByGuardName}
               </span>
               {incident.policeNotified && (
-                <span className="text-emerald-700 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                <span className="text-slate-700 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                   ✓ SFPD CAD Dispatched ({incident.policeCadNumber || 'ACTIVE'})
                 </span>
               )}
@@ -148,7 +148,7 @@ export const SOSAlarmHUD: React.FC<SOSAlarmHUDProps> = ({
               <span>Alert 911 / Police CAD</span>
             </button>
           ) : (
-            <div className="flex items-center gap-1 text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-300 px-2.5 py-1.5 rounded-lg font-bold">
+            <div className="flex items-center gap-1 text-[11px] font-mono text-slate-800 bg-emerald-50 border border-emerald-300 px-2.5 py-1.5 rounded-lg font-bold">
               <span>CAD #88491-A ACTIVE</span>
             </div>
           )}
@@ -161,9 +161,9 @@ export const SOSAlarmHUD: React.FC<SOSAlarmHUDProps> = ({
               tacticalAudio.playCheckpointScan();
               onResolveSOS(incident.id);
             }}
-            className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 px-3 py-2 text-xs font-bold text-emerald-800 transition-colors shadow-xs"
+            className="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 px-3 py-2 text-xs font-bold text-slate-800 transition-colors shadow-xs"
           >
-            <UserCheck className="h-4 w-4 text-emerald-700" />
+            <UserCheck className="h-4 w-4 text-slate-700" />
             <span>Resolve Distress</span>
           </button>
         </div>

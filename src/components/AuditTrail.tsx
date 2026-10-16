@@ -22,7 +22,7 @@ export const AuditTrail: React.FC<AuditTrailProps> = ({ events }) => {
       <header className="flex flex-col gap-3 border-b border-slate-200 pb-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-            <ShieldCheck className="h-5 w-5 text-blue-600" />
+            <ShieldCheck className="h-5 w-5 text-slate-600" />
             Immutable Security Audit Trail
           </h2>
           <p className="text-xs font-mono text-slate-500">Authenticated actions, entity changes, and emergency command events</p>
@@ -59,10 +59,10 @@ export const AuditTrail: React.FC<AuditTrailProps> = ({ events }) => {
                   </td>
                   <td className="px-4 py-3">
                     <div className="font-semibold text-slate-900">{event.actorName}</div>
-                    <div className="mt-0.5 font-mono text-[10px] text-blue-700">{event.actorRole}</div>
+                    <div className="mt-0.5 font-mono text-[10px] text-slate-700">{event.actorRole}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex rounded-md border border-blue-200 bg-blue-50 px-2 py-1 font-mono font-bold text-blue-800">
+                    <span className="inline-flex rounded-md border border-blue-200 bg-blue-50 px-2 py-1 font-mono font-bold text-slate-800">
                       {event.action}
                     </span>
                   </td>

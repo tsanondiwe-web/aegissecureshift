@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 
+import { firebaseAuthMessage } from './access';
 import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 import {
   User,
@@ -91,10 +92,10 @@ export async function signInToFirebase(email: string, password: string) {
   const app = getFirebaseApp();
   if (!app) return { success: false, error: new Error('Firebase is not configured.') };
   try {
-    await signInWithEmailAndPassword(getAuth(app), email, password);
+    await signInWithEmailAndPassword(getAuth(app), email.trim().toLowerCase(), password);
     return { success: true, error: null };
   } catch (error) {
-    return { success: false, error: error as Error };
+    return { success: false, error: new Error(firebaseAuthMessage(error)) };
   }
 }
 
@@ -117,9 +118,14 @@ export async function getAuthenticatedUserAccount(user: User): Promise<UserAccou
   const db = getFirebaseDb();
   if (!db) return null;
   const snapshot = await getDoc(doc(db, 'admin_users', user.uid));
-  if (!snapshot.exists()) return null;
+  if (!snapshot.exists()) {
+    throw new Error('Your Firebase login has no command-centre access profile. Ask your superadmin to link the admin_users record to your Firebase Authentication user ID.');
+  }
   const account = dataWithId<UserAccount>(snapshot);
-  if (account.status !== 'ACTIVE') return null;
+  if (account.status !== 'ACTIVE') throw new Error('This account is inactive. Ask your administrator to enable it.');
+  if (!['SUPERADMIN', 'TENANT_ADMIN', 'SUPERVISOR', 'DISPATCHER', 'GUARD'].includes(account.role)) {
+    throw new Error('This account has an unsupported role. Ask your superadmin to correct its access profile.');
+  }
   return { ...account, email: account.email || user.email || '', lastLogin: 'Just now' };
 }
 

@@ -64,7 +64,7 @@ export const BroadcastModal: React.FC<BroadcastModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 border border-blue-200">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-slate-600 border border-blue-200">
               <Radio className="h-5 w-5 animate-pulse" />
             </div>
             <div>
@@ -82,7 +82,7 @@ export const BroadcastModal: React.FC<BroadcastModalProps> = ({
 
         {sentSuccess ? (
           <div className="my-8 flex flex-col items-center justify-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-slate-600 border border-emerald-200">
               <ShieldCheck className="h-8 w-8" />
             </div>
             <h4 className="mt-3 text-base font-bold text-slate-900">Broadcast Dispatched Successfully</h4>
@@ -103,11 +103,11 @@ export const BroadcastModal: React.FC<BroadcastModalProps> = ({
                   onClick={() => setScope('all_sites')}
                   className={`flex flex-col items-center justify-center rounded-lg p-2.5 text-center text-xs font-bold transition-all ${
                     scope === 'all_sites'
-                      ? 'bg-blue-50 text-blue-800 border border-blue-300 shadow-2xs'
+                      ? 'bg-blue-50 text-slate-800 border border-blue-300 shadow-2xs'
                       : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  <Users className="h-4 w-4 mb-1 text-blue-600" />
+                  <Users className="h-4 w-4 mb-1 text-slate-600" />
                   <span>All Active Sites</span>
                 </button>
                 <button
@@ -115,11 +115,11 @@ export const BroadcastModal: React.FC<BroadcastModalProps> = ({
                   onClick={() => setScope('single_site')}
                   className={`flex flex-col items-center justify-center rounded-lg p-2.5 text-center text-xs font-bold transition-all ${
                     scope === 'single_site'
-                      ? 'bg-blue-50 text-blue-800 border border-blue-300 shadow-2xs'
+                      ? 'bg-blue-50 text-slate-800 border border-blue-300 shadow-2xs'
                       : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  <Building className="h-4 w-4 mb-1 text-blue-600" />
+                  <Building className="h-4 w-4 mb-1 text-slate-600" />
                   <span>Specific Site</span>
                 </button>
                 <button
@@ -127,11 +127,11 @@ export const BroadcastModal: React.FC<BroadcastModalProps> = ({
                   onClick={() => setScope('individual_guard')}
                   className={`flex flex-col items-center justify-center rounded-lg p-2.5 text-center text-xs font-bold transition-all ${
                     scope === 'individual_guard'
-                      ? 'bg-blue-50 text-blue-800 border border-blue-300 shadow-2xs'
+                      ? 'bg-blue-50 text-slate-800 border border-blue-300 shadow-2xs'
                       : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  <Radio className="h-4 w-4 mb-1 text-blue-600" />
+                  <Radio className="h-4 w-4 mb-1 text-slate-600" />
                   <span>Individual Guard</span>
                 </button>
               </div>
@@ -187,7 +187,7 @@ export const BroadcastModal: React.FC<BroadcastModalProps> = ({
                           ? 'bg-rose-50 text-rose-800 border-rose-300 shadow-2xs'
                           : p === 'Urgent'
                           ? 'bg-amber-50 text-amber-800 border-amber-300 shadow-2xs'
-                          : 'bg-blue-50 text-blue-800 border-blue-300 shadow-2xs'
+                          : 'bg-blue-50 text-slate-800 border-blue-300 shadow-2xs'
                         : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                     }`}
                   >

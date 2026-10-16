@@ -115,7 +115,7 @@ export const ReportsAnalytics: React.FC<ReportsAnalyticsProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
           <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-blue-600" />
+            <BarChart3 className="h-5 w-5 text-slate-600" />
             <span>Reports & Operational Analytics Centre</span>
           </h2>
           <p className="text-xs text-slate-500 font-mono">
@@ -156,7 +156,7 @@ export const ReportsAnalytics: React.FC<ReportsAnalyticsProps> = ({
             onClick={handleExportSummary}
             className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition-colors"
           >
-            <Printer className="h-3.5 w-3.5 text-blue-600" />
+            <Printer className="h-3.5 w-3.5 text-slate-600" />
             <span>Print Report</span>
           </button>
         </div>
@@ -167,27 +167,27 @@ export const ReportsAnalytics: React.FC<ReportsAnalyticsProps> = ({
         <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
             <span>Guaranteed SLA Coverage</span>
-            <Shield className="h-4 w-4 text-emerald-600" />
+            <Shield className="h-4 w-4 text-slate-600" />
           </div>
-          <div className="mt-1 text-2xl font-bold font-mono text-emerald-700">99.8%</div>
+          <div className="mt-1 text-2xl font-bold font-mono text-slate-700">99.8%</div>
           <div className="text-[10px] text-slate-400 font-mono mt-0.5">24/7 Monitored Posts & Blueprints</div>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
             <span>Avg SOS Dispatch Time (MTTR)</span>
-            <Clock className="h-4 w-4 text-blue-600" />
+            <Clock className="h-4 w-4 text-slate-600" />
           </div>
-          <div className="mt-1 text-2xl font-bold font-mono text-blue-700">2.1 min</div>
+          <div className="mt-1 text-2xl font-bold font-mono text-slate-700">2.1 min</div>
           <div className="text-[10px] text-slate-400 font-mono mt-0.5">Below 3.0m Mandated SLA Target</div>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
             <span>Patrol Tour Checkpoint Scans</span>
-            <CheckCircle2 className="h-4 w-4 text-indigo-600" />
+            <CheckCircle2 className="h-4 w-4 text-slate-600" />
           </div>
-          <div className="mt-1 text-2xl font-bold font-mono text-indigo-700">98.4%</div>
+          <div className="mt-1 text-2xl font-bold font-mono text-slate-700">98.4%</div>
           <div className="text-[10px] text-slate-400 font-mono mt-0.5">Optical QR & GPS Verified</div>
         </div>
 
@@ -212,7 +212,7 @@ export const ReportsAnalytics: React.FC<ReportsAnalyticsProps> = ({
               </span>
               <p className="text-[11px] text-slate-500 font-mono">Hourly active post fulfillment across facilities</p>
             </div>
-            <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            <span className="text-[10px] font-mono text-slate-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
               SLA TARGET &gt;95%
             </span>
           </div>
@@ -246,7 +246,7 @@ export const ReportsAnalytics: React.FC<ReportsAnalyticsProps> = ({
               </span>
               <p className="text-[11px] text-slate-500 font-mono">Response time from alert trigger to on-scene arrival</p>
             </div>
-            <span className="text-[10px] font-mono text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            <span className="text-[10px] font-mono text-slate-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
               LOWER IS BETTER
             </span>
           </div>
@@ -287,7 +287,7 @@ export const ReportsAnalytics: React.FC<ReportsAnalyticsProps> = ({
               <div key={idx} className="space-y-1">
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-blue-600" />
+                    <MapPin className="h-3.5 w-3.5 text-slate-600" />
                     <span>{item.site}</span>
                   </span>
                   <span className="font-mono font-bold text-slate-900">{item.compliance}%</span>
@@ -384,22 +384,22 @@ export const ReportsAnalytics: React.FC<ReportsAnalyticsProps> = ({
                 <tr key={g.id} className="hover:bg-slate-50">
                   <td className="p-2.5 font-sans font-bold text-slate-900">{g.name}</td>
                   <td className="p-2.5 text-slate-600 font-mono">{g.badgeNumber}</td>
-                  <td className="p-2.5 text-blue-700 font-semibold">{g.tier}</td>
+                  <td className="p-2.5 text-slate-700 font-semibold">{g.tier}</td>
                   <td className="p-2.5 text-slate-600 font-sans">{g.siteName ? g.siteName.split(' (')[0] : 'Assigned Post'}</td>
                   <td className="p-2.5 text-center">
                     <span
                       className={`inline-block rounded px-2 py-0.5 text-[10px] font-bold ${
                         g.status === 'On Patrol'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          ? 'bg-emerald-50 text-slate-700 border border-emerald-200'
                           : g.status === 'Stationary'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          ? 'bg-blue-50 text-slate-700 border border-blue-200'
                           : 'bg-slate-100 text-slate-600'
                       }`}
                     >
                       {g.status}
                     </span>
                   </td>
-                  <td className="p-2.5 text-right font-bold text-emerald-700">99.2%</td>
+                  <td className="p-2.5 text-right font-bold text-slate-700">99.2%</td>
                 </tr>
               ))}
             </tbody>

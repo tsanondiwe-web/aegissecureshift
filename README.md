@@ -1,5 +1,7 @@
 # AegisOps Security Command Center
 
+For the current test-site release, see [deployment and acceptance checks](docs/TEST_DEPLOYMENT.md).
+
 A multi-tenant React, Firebase Auth, Firestore, and Cloud Functions security
 operations console for guard telemetry, incident response, QR checkpoint
 verification, scheduling, reporting, and billing.

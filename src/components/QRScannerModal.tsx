@@ -83,13 +83,13 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-slate-600 border border-blue-200">
               <QrCode className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <span>Mobile QR Checkpoint Scanner</span>
-                <span className="rounded bg-emerald-50 px-2 py-0.5 text-[10px] font-mono text-emerald-800 border border-emerald-200 font-bold">
+                <span className="rounded bg-emerald-50 px-2 py-0.5 text-[10px] font-mono text-slate-800 border border-emerald-200 font-bold">
                   TRACKING ENFORCED
                 </span>
               </h3>
@@ -134,7 +134,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                   </div>
                   <div className="space-y-1 truncate">
                     <div className="text-xs font-bold text-slate-900 truncate">{cp.name}</div>
-                    <div className="text-[10px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 inline-block">
+                    <div className="text-[10px] font-mono font-bold text-slate-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200 inline-block">
                       {cp.qrCodeValue || `QR-${cp.id.toUpperCase()}`}
                     </div>
                     <p className="text-[10px] text-slate-500 truncate">{cp.requiredAction}</p>
@@ -208,7 +208,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                     <QrCode className="h-full w-full text-slate-900" />
                   </div>
 
-                  <div className="mt-1.5 text-[9px] font-mono font-bold text-emerald-400 uppercase tracking-widest">
+                  <div className="mt-1.5 text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
                     {isScanning ? 'DECODING QR...' : scanSuccess ? 'VERIFIED' : 'ALIGN RETICLE'}
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
 
                 <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[9px] font-mono text-slate-400 z-20">
                   <span>GPS: Passive (Tracking Off)</span>
-                  <span className="text-emerald-400 font-bold">QR Optical Fix: Active</span>
+                  <span className="text-slate-400 font-bold">QR Optical Fix: Active</span>
                 </div>
               </div>
 
@@ -262,7 +262,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-slate-500 text-[10px] font-bold uppercase">Decoded Payload:</span>
-                      <span className="font-mono text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                      <span className="font-mono text-[10px] font-bold text-slate-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
                         {targetCheckpoint.qrCodeValue || `QR-${targetCheckpoint.id.toUpperCase()}`}
                       </span>
                     </div>
@@ -317,7 +317,7 @@ export const QRScannerModal: React.FC<QRScannerModalProps> = ({
                 <span className="text-slate-500 font-bold uppercase text-[10px]">
                   {currentGuard.name}'s Current Tracking Fix:
                 </span>
-                <span className="text-blue-700 font-bold">
+                <span className="text-slate-700 font-bold">
                   {currentGuard.lastScannedCheckpointName || 'Initial Duty Station'}
                 </span>
               </div>

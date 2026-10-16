@@ -189,7 +189,7 @@ export const NewIncidentModal: React.FC<NewIncidentModalProps> = ({
               id="chk-police"
               checked={policeNotified}
               onChange={(e) => setPoliceNotified(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 bg-white text-blue-600"
+              className="h-4 w-4 rounded border-slate-300 bg-white text-slate-600"
             />
             <label htmlFor="chk-police" className="text-xs text-slate-800 font-medium">
               Simulate Instant SAPS 10111 Police CAD & Armed Reaction Transmission

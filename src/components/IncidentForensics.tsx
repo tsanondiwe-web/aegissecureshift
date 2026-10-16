@@ -222,7 +222,7 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
                             ? 'bg-orange-50 text-orange-800 border border-orange-200'
                             : inc.severity === 'Medium'
                             ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                            : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            : 'bg-emerald-50 text-slate-800 border border-emerald-200'
                         }`}
                       >
                         {inc.severity}
@@ -235,7 +235,7 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
                     <span
                       className={`rounded px-1.5 py-0.5 text-[9px] font-mono uppercase font-bold ${
                         inc.status === 'Resolved'
-                          ? 'text-emerald-800 bg-emerald-50 border border-emerald-200'
+                          ? 'text-slate-800 bg-emerald-50 border border-emerald-200'
                           : 'text-amber-800 bg-amber-50 border border-amber-200'
                       }`}
                     >
@@ -292,7 +292,7 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
                     onClick={() => exportIncidentToPDF(selectedIncident)}
                     className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition-colors"
                   >
-                    <Printer className="h-3.5 w-3.5 text-blue-600" />
+                    <Printer className="h-3.5 w-3.5 text-slate-600" />
                     <span>Print PDF Dossier</span>
                   </button>
 
@@ -334,7 +334,7 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
                   <div className="text-[10px] font-mono text-slate-500 uppercase font-semibold">
                     Police CAD Alert
                   </div>
-                  <div className="font-bold text-emerald-700 mt-0.5 font-mono">
+                  <div className="font-bold text-slate-700 mt-0.5 font-mono">
                     {selectedIncident.policeNotified
                       ? `Yes (${selectedIncident.policeCadNumber || 'ACTIVE'})`
                       : 'Internal Only'}
@@ -388,9 +388,9 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
                       ) : (
                         // Audio Voice Memo Player
                         <div>
-                          <div className="flex items-center justify-between text-xs font-mono text-blue-700 mb-2 font-bold">
+                          <div className="flex items-center justify-between text-xs font-mono text-slate-700 mb-2 font-bold">
                             <span className="flex items-center gap-1.5">
-                              <Volume2 className="h-4 w-4 text-blue-600" />
+                              <Volume2 className="h-4 w-4 text-slate-600" />
                               <span>TACTICAL VOICE MEMO</span>
                             </span>
                             <span>{ev.audioDurationSeconds || 14}s</span>
@@ -448,7 +448,7 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
                       key={item.id}
                       className="flex items-start gap-3 rounded-lg bg-slate-50 p-2.5 border border-slate-200 text-xs"
                     >
-                      <span className="font-mono text-blue-700 font-bold shrink-0">
+                      <span className="font-mono text-slate-700 font-bold shrink-0">
                         [{item.timestamp}]
                       </span>
                       <div>
@@ -466,12 +466,12 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
                 <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                      <span className="text-xs font-mono font-bold uppercase text-emerald-900">
+                      <CheckCircle2 className="h-5 w-5 text-slate-600" />
+                      <span className="text-xs font-mono font-bold uppercase text-slate-900">
                         Supervisory Review Certified & Closed
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono text-emerald-700 font-semibold">
+                    <span className="text-[10px] font-mono text-slate-700 font-semibold">
                       {selectedIncident.supervisorSignOff.signedAt}
                     </span>
                   </div>
@@ -482,7 +482,7 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
                   <p className="mt-1 text-xs text-slate-600 italic">
                     "{selectedIncident.supervisorSignOff.notes}"
                   </p>
-                  <div className="mt-3 pt-2 border-t border-emerald-200 font-mono text-[10px] text-emerald-800 font-bold">
+                  <div className="mt-3 pt-2 border-t border-emerald-200 font-mono text-[10px] text-slate-800 font-bold">
                     DIGITAL SIGNATURE HASH: {selectedIncident.supervisorSignOff.signatureDigital}
                   </div>
                 </div>
@@ -501,7 +501,7 @@ export const IncidentForensics: React.FC<IncidentForensicsProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
           <div className="relative w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-2xl">
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <UserCheck className="h-5 w-5 text-emerald-600" />
+              <UserCheck className="h-5 w-5 text-slate-600" />
               <span>Supervisor Forensic Sign-Off</span>
             </h3>
             <p className="text-xs text-slate-500 font-mono mt-1">

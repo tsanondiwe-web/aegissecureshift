@@ -29,6 +29,7 @@ import {
   AuditEvent,
 } from './types';
 import { Header } from './components/Header';
+import { MinimalistOverview } from './components/MinimalistOverview';
 import { Sidebar } from './components/Sidebar';
 import { SOSAlarmHUD } from './components/SOSAlarmHUD';
 import { BroadcastModal } from './components/BroadcastModal';
@@ -125,6 +126,15 @@ const EXAMPLE_USERS = INITIAL_USERS.filter(
 export default function App() {
   // Navigation & View State
   const [activeTab, setActiveTab] = useState<string>('live_map');
+  const [minimalistView, setMinimalistView] = useState<boolean>(() => {
+    try { return localStorage.getItem('secureshift.workspace-view') !== 'full'; }
+    catch { return true; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem('secureshift.workspace-view', minimalistView ? 'minimal' : 'full'); }
+    catch { /* The view still works when browser storage is unavailable. */ }
+  }, [minimalistView]);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -183,18 +193,26 @@ export default function App() {
   useEffect(() => {
     if (!isFirebaseConfigured) return;
     let disposed = false;
+    let sessionVersion = 0;
 
     const applySession = async (session: Awaited<ReturnType<typeof getFirebaseUser>>) => {
-      if (disposed) return;
+      const version = ++sessionVersion;
+      const isCurrent = () => !disposed && version === sessionVersion;
+      if (!isCurrent()) return;
       if (!session) {
         setIsAuthenticated(false);
+        setIsNewAdminModalOpen(false); setIsNewTenantModalOpen(false);
+        setSelectedTenantForNewAdmin(undefined);
+        setSites([]); setGuards([]); setIncidents([]); setCheckpoints([]);
+        setShifts([]); setTours([]); setAttendance([]); setUsers([]); setAuditEvents([]);
         setAuthLoading(false);
         return;
       }
 
+      setAuthLoading(true);
       try {
         const account = await getAuthenticatedUserAccount(session);
-        if (disposed) return;
+        if (!isCurrent()) return;
         if (!account) {
           setIsAuthenticated(false);
           setAuthError('Your login is valid, but no active AegisOps access profile is assigned.');
@@ -209,7 +227,7 @@ export default function App() {
         }
 
         const accessibleTenants = await getAccessibleTenants();
-        if (disposed) return;
+        if (!isCurrent()) return;
         setCurrentUser(account);
         setTenants(accessibleTenants);
         const assignedTenant = account.tenantId
@@ -223,28 +241,24 @@ export default function App() {
         }
         if (!assignedTenant) {
           setIsAuthenticated(false);
-          setAuthError('Your account has no accessible tenant organization.');
+          setAuthError('Your account has no accessible tenant organization. Ask your superadmin to check its tenant assignment.');
+          await signOutOfFirebase();
           return;
         }
         setCurrentTenant(assignedTenant);
         setAuthError('');
         setIsAuthenticated(true);
       } catch (error) {
-        if (!disposed) {
+        if (isCurrent()) {
           setIsAuthenticated(false);
           setAuthError(error instanceof Error ? error.message : 'Unable to load the authenticated access profile.');
+          await signOutOfFirebase();
         }
       } finally {
-        if (!disposed) setAuthLoading(false);
+        if (isCurrent()) setAuthLoading(false);
       }
     };
 
-    getFirebaseUser().then(applySession).catch((error) => {
-      if (!disposed) {
-        setAuthError(error instanceof Error ? error.message : 'Unable to verify the current session.');
-        setAuthLoading(false);
-      }
-    });
     const unsubscribe = subscribeToFirebaseAuth(applySession);
     return () => {
       disposed = true;
@@ -256,6 +270,7 @@ export default function App() {
   useEffect(() => {
     if (!isFirebaseConfigured || !isAuthenticated) return;
 
+    let disposed = false;
     setFirebaseLive(true);
     const tenantScope = currentUser.role === 'SUPERADMIN' ? undefined : currentUser.tenantId;
 
@@ -289,12 +304,14 @@ export default function App() {
     const unsubAuditEvents = subscribeToFirebaseAuditEvents(setAuditEvents, tenantScope);
     if (currentUser.role === 'SUPERADMIN' || currentUser.role === 'TENANT_ADMIN') {
       getFirebaseManagedUsers().then((result) => {
+        if (disposed) return;
         if (result.success) setUsers(result.users);
         else console.warn('Unable to load managed users:', result.error);
       });
     }
 
     return () => {
+      disposed = true;
       unsubSites();
       unsubGuards();
       unsubIncidents();
@@ -936,7 +953,7 @@ export default function App() {
     // 2. Update tenant's primaryAdmin fields if not present
     setTenants((prev) =>
       prev.map((t) => {
-        if (t.id === provisionedUser.tenantId && !t.primaryAdminName) {
+        if (provisionedUser.role === 'TENANT_ADMIN' && t.id === provisionedUser.tenantId && !t.primaryAdminName) {
           return {
             ...t,
             primaryAdminId: provisionedUser.id,
@@ -1029,6 +1046,8 @@ export default function App() {
     <div className="aegis-shell min-h-screen bg-[#FAFAF9] text-slate-900 flex flex-col font-sans selection:bg-slate-200 selection:text-slate-950">
       {/* Top Tactical Command Header */}
       <Header
+        minimalistView={minimalistView}
+        onToggleMinimalistView={() => { setMinimalistView((previous) => !previous); setActiveTab('live_map'); }}
         tenants={visibleTenants}
         currentTenant={currentTenant}
         onSelectTenant={handleSelectTenant}
@@ -1095,12 +1114,27 @@ export default function App() {
               onNotifyPoliceCAD={handleNotifyPoliceCAD}
               onResolveSOS={handleResolveSOS}
               onCloseBanner={() => {}}
-              onFocusIncidentOnMap={() => setActiveTab('live_map')}
+              onFocusIncidentOnMap={() => { setMinimalistView(false); setActiveTab('live_map'); }}
+            />
+          )}
+
+          {activeTab === 'live_map' && minimalistView && scopedSites.length > 0 && (
+            <MinimalistOverview
+              companyName={currentTenant.name}
+              siteCount={scopedSites.length}
+              activeGuardCount={activeGuardsCount}
+              incidents={scopedIncidents}
+              scheduledShiftCount={scopedShifts.filter((shift) => shift.status === 'Scheduled').length}
+              onLogIncident={() => setIsNewIncidentOpen(true)}
+              canLogIncident={scopedGuards.length > 0}
+              onViewRoster={() => setActiveTab('scheduling')}
+              onViewIncidents={() => setActiveTab('incidents')}
+              onOpenLiveMap={() => { setMinimalistView(false); setActiveTab('live_map'); }}
             />
           )}
 
           {/* Tab 1: Live Map & Dispatch Center */}
-          {activeTab === 'live_map' && scopedSites.length > 0 && (
+          {activeTab === 'live_map' && !minimalistView && scopedSites.length > 0 && (
             <LiveMapCommandCenter
               sites={scopedSites}
               currentSite={currentSite}

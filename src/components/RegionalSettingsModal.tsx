@@ -44,7 +44,7 @@ export const RegionalSettingsModal: React.FC<RegionalSettingsModalProps> = ({ te
         <div className="flex items-start justify-between border-b border-slate-100 pb-3">
           <div className="flex gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-200 bg-blue-50">
-              <Globe2 className="h-5 w-5 text-blue-700" />
+              <Globe2 className="h-5 w-5 text-slate-700" />
             </div>
             <div>
               <h2 className="font-bold text-slate-900">Regional and currency settings</h2>

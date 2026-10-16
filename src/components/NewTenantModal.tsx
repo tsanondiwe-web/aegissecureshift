@@ -1,3 +1,4 @@
+import { createTemporaryPassword } from '../lib/access';
 import React, { useState } from 'react';
 import {
   Building2,
@@ -56,7 +57,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPhone, setAdminPhone] = useState('');
-  const [tempPassword, setTempPassword] = useState('AegisGuard2026!#');
+  const [tempPassword, setTempPassword] = useState(createTemporaryPassword);
 
   // Completion State
   const [createdCredentials, setCreatedCredentials] = useState<{
@@ -189,7 +190,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
           /* Success Screen with Copyable Credentials */
           <div className="space-y-5 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 text-2xl">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-slate-600 border border-emerald-200 text-2xl">
                 ✓
               </div>
               <div>
@@ -211,7 +212,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
                     {createdCredentials.tenant.name}
                   </div>
                   <div className="text-xs text-slate-600 font-mono">
-                    Code: <strong className="text-blue-700">{createdCredentials.tenant.code}</strong> • Tier:{' '}
+                    Code: <strong className="text-slate-700">{createdCredentials.tenant.code}</strong> • Tier:{' '}
                     <span className="text-slate-800">{createdCredentials.tenant.plan}</span>
                   </div>
                 </div>
@@ -221,7 +222,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
             {/* Admin Credentials Card */}
             <div className="rounded-xl border border-slate-200 bg-slate-900 text-slate-100 p-4 font-mono text-xs space-y-2.5">
               <div className="flex items-center justify-between border-b border-slate-800 pb-2 text-[11px] text-slate-400 font-sans font-bold">
-                <span className="flex items-center gap-1.5 text-emerald-400 font-mono">
+                <span className="flex items-center gap-1.5 text-slate-400 font-mono">
                   <UserCheck className="h-3.5 w-3.5" />
                   TENANT ADMINISTRATOR CREDENTIALS
                 </span>
@@ -233,7 +234,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
                 <div className="col-span-2 text-white font-bold">{createdCredentials.admin.name}</div>
 
                 <div className="text-slate-400">Login Email:</div>
-                <div className="col-span-2 text-emerald-400 font-bold">{createdCredentials.admin.email}</div>
+                <div className="col-span-2 text-slate-400 font-bold">{createdCredentials.admin.email}</div>
 
                 <div className="text-slate-400">Temp Password:</div>
                 <div className="col-span-2 text-amber-300 font-bold bg-slate-800/80 px-2 py-0.5 rounded inline-block">
@@ -241,13 +242,13 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
                 </div>
 
                 <div className="text-slate-400">Role Assigned:</div>
-                <div className="col-span-2 text-blue-300 font-bold">TENANT_ADMIN (Full Org Control)</div>
+                <div className="col-span-2 text-slate-300 font-bold">TENANT_ADMIN (Full Org Control)</div>
               </div>
             </div>
 
             <div className={`rounded-xl border p-3 text-xs ${
               createdCredentials.invitationEmailSent
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                ? 'border-emerald-200 bg-emerald-50 text-slate-800'
                 : 'border-amber-200 bg-amber-50 text-amber-900'
             }`}>
               {createdCredentials.invitationEmailSent
@@ -283,7 +284,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-slate-600 border border-blue-200">
                   <Building2 className="h-5 w-5" />
                 </div>
                 <div>
@@ -307,7 +308,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
             {/* Section 1: Organization Details */}
             <div className="space-y-3">
               <div className="text-xs font-bold text-slate-800 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                <Building2 className="h-3.5 w-3.5 text-blue-600" />
+                <Building2 className="h-3.5 w-3.5 text-slate-600" />
                 <span>1. Organization Details</span>
               </div>
 
@@ -420,11 +421,11 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
             {/* Section 2: Primary Tenant Administrator Account */}
             <div className="space-y-3 pt-2 border-t border-slate-100">
               <div className="text-xs font-bold text-slate-800 uppercase tracking-wider font-mono flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-blue-700">
+                <span className="flex items-center gap-1.5 text-slate-700">
                   <UserCheck className="h-3.5 w-3.5" />
                   <span>2. Tenant Administrator Account (Provisioned Instantly)</span>
                 </span>
-                <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono font-bold">
+                <span className="text-[10px] bg-blue-100 text-slate-800 px-2 py-0.5 rounded font-mono font-bold">
                   ROLE: TENANT_ADMIN
                 </span>
               </div>
@@ -498,7 +499,7 @@ export const NewTenantModal: React.FC<NewTenantModalProps> = ({
                     type="checkbox"
                     checked={createInitialSite}
                     onChange={(e) => setCreateInitialSite(e.target.checked)}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-slate-300 text-slate-600 focus:ring-blue-500"
                   />
                   <span className="text-xs font-bold text-slate-800">
                     Deploy primary facility / site for this tenant immediately

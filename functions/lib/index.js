@@ -5,6 +5,7 @@ const app_1 = require("firebase-admin/app");
 const auth_1 = require("firebase-admin/auth");
 const firestore_1 = require("firebase-admin/firestore");
 const https_1 = require("firebase-functions/v2/https");
+const userPolicy_js_1 = require("./userPolicy.js");
 (0, app_1.initializeApp)();
 const db = (0, firestore_1.getFirestore)();
 function distanceMetres(lat1, lon1, lat2, lon2) {
@@ -247,7 +248,6 @@ exports.provisionTenant = (0, https_1.onCall)(async (request) => {
         throw new https_1.HttpsError('internal', 'Tenant provisioning failed. No tenant was created.');
     }
 });
-const ordinaryUserRoles = new Set(['DISPATCHER', 'SUPERVISOR', 'GUARD']);
 exports.createTenantAdmin = (0, https_1.onCall)(async (request) => {
     if (!request.auth)
         throw new https_1.HttpsError('unauthenticated', 'Sign in first.');
@@ -256,22 +256,37 @@ exports.createTenantAdmin = (0, https_1.onCall)(async (request) => {
     if (!callerSnapshot.exists || caller?.status !== 'ACTIVE') {
         throw new https_1.HttpsError('permission-denied', 'Only an active administrator can create users.');
     }
-    const user = request.data.user;
-    if (!user.email || !user.temporaryPassword || !user.name || !user.tenantId) {
+    const user = request.data?.user;
+    if (!user || typeof user.email !== 'string' || !user.email.trim()
+        || typeof user.temporaryPassword !== 'string' || typeof user.name !== 'string' || !user.name.trim()
+        || !(0, userPolicy_js_1.safeIdentifier)(user.tenantId)) {
         throw new https_1.HttpsError('invalid-argument', 'Name, tenant, email, and temporary password are required.');
     }
     validatePassword(user.temporaryPassword);
     const callerRole = caller.role;
     const callerTenantId = caller.tenantId;
-    const tenantAdminMayCreate = callerRole === 'TENANT_ADMIN'
-        && ordinaryUserRoles.has(user.role)
-        && Boolean(callerTenantId)
-        && callerTenantId === user.tenantId;
-    const superadminMayCreate = callerRole === 'SUPERADMIN' && user.role !== 'SUPERADMIN';
-    if (!tenantAdminMayCreate && !superadminMayCreate) {
-        throw new https_1.HttpsError('permission-denied', user.role === 'TENANT_ADMIN'
-            ? 'Only a superadmin can create tenant administrators.'
-            : 'Tenant administrators may create only ordinary users in their own tenant.');
+    if (!userPolicy_js_1.tenantUserRoles.has(user.role)) {
+        throw new https_1.HttpsError('invalid-argument', 'Choose a tenant administrator, dispatcher, supervisor, or guard role.');
+    }
+    if (!(0, userPolicy_js_1.mayCreateTenantUser)({ role: callerRole, status: caller.status, tenantId: callerTenantId }, user.role, user.tenantId)) {
+        throw new https_1.HttpsError('permission-denied', 'Only a superadmin may create tenant administrators. Tenant admins may create ordinary users in their own tenant only.');
+    }
+    const tenantSnapshot = await db.collection('tenants').doc(user.tenantId).get();
+    if (!tenantSnapshot.exists)
+        throw new https_1.HttpsError('not-found', 'The selected tenant no longer exists.');
+    const tenantName = tenantSnapshot.data().name;
+    let assignedSite;
+    if (user.assignedSiteId) {
+        if (!(0, userPolicy_js_1.safeIdentifier)(user.assignedSiteId))
+            throw new https_1.HttpsError('invalid-argument', 'Select a valid site.');
+        const site = await db.collection('sites').doc(user.assignedSiteId).get();
+        if (!site.exists || site.data().tenantId !== user.tenantId) {
+            throw new https_1.HttpsError('permission-denied', 'The selected site does not belong to this tenant.');
+        }
+        assignedSite = { id: site.id, name: site.data().name };
+    }
+    if (user.role === 'GUARD' && !assignedSite) {
+        throw new https_1.HttpsError('invalid-argument', 'Assign this guard to a specific site.');
     }
     let createdUserId = null;
     try {
@@ -283,7 +298,13 @@ exports.createTenantAdmin = (0, https_1.onCall)(async (request) => {
         });
         createdUserId = created.uid;
         const collectionName = user.role === 'GUARD' ? 'guards' : 'admin_users';
-        const { temporaryPassword: _temporaryPassword, ...safeProfile } = user;
+        // Persist only supported profile fields, never arbitrary caller-supplied data.
+        const safeProfile = {
+            name: user.name.trim(), email: normalizedEmail, phone: user.phone || '',
+            role: user.role, tenantId: user.tenantId, tenantName,
+            ...(user.avatar ? { avatar: user.avatar } : {}),
+            ...(assignedSite ? { assignedSiteId: assignedSite.id, assignedSiteName: assignedSite.name } : {}),
+        };
         const createdAt = new Date().toISOString();
         const storedProfile = {
             ...safeProfile,
@@ -291,6 +312,7 @@ exports.createTenantAdmin = (0, https_1.onCall)(async (request) => {
             name: user.name.trim(),
             email: normalizedEmail,
             status: user.role === 'GUARD' ? 'offline' : 'ACTIVE',
+            ...(user.role === 'GUARD' && assignedSite ? { siteId: assignedSite.id, siteName: assignedSite.name } : {}),
             accountStatus: 'ACTIVE',
             createdAt,
             updatedAt: createdAt,
@@ -325,12 +347,17 @@ exports.createTenantAdmin = (0, https_1.onCall)(async (request) => {
         }
         if (error instanceof https_1.HttpsError)
             throw error;
+        const code = error.code;
+        if (code === 'auth/email-already-exists')
+            throw new https_1.HttpsError('already-exists', 'This email already has a login. Use the existing account or another email.');
+        if (code === 'auth/invalid-email')
+            throw new https_1.HttpsError('invalid-argument', 'Enter a valid email address.');
         console.error('User provisioning failed', error);
-        throw new https_1.HttpsError('internal', 'User provisioning failed. No account was created.');
+        throw new https_1.HttpsError('internal', 'User provisioning failed. Ask your superadmin to verify the account before retrying.');
     }
 });
 function validatePassword(password) {
-    if (password.length < 12
+    if (typeof password !== 'string' || password.length < 12
         || !/[a-z]/.test(password)
         || !/[A-Z]/.test(password)
         || !/\d/.test(password)
@@ -394,7 +421,7 @@ exports.resetUserPassword = (0, https_1.onCall)(async (request) => {
     }
     const superadminMayReset = callerRole === 'SUPERADMIN';
     const tenantAdminMayReset = callerRole === 'TENANT_ADMIN'
-        && ordinaryUserRoles.has(targetRole)
+        && userPolicy_js_1.ordinaryUserRoles.has(targetRole)
         && Boolean(callerTenantId)
         && callerTenantId === targetTenantId;
     if (!superadminMayReset && !tenantAdminMayReset) {
@@ -457,7 +484,7 @@ exports.setUserEnabled = (0, https_1.onCall)(async (request) => {
     }
     const superadminMayManage = callerRole === 'SUPERADMIN';
     const tenantAdminMayManage = callerRole === 'TENANT_ADMIN'
-        && ordinaryUserRoles.has(targetRole)
+        && userPolicy_js_1.ordinaryUserRoles.has(targetRole)
         && Boolean(callerTenantId)
         && callerTenantId === targetTenantId;
     if (!superadminMayManage && !tenantAdminMayManage) {

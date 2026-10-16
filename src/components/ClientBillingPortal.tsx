@@ -68,7 +68,7 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
           <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-blue-600" />
+            <CreditCard className="h-5 w-5 text-slate-600" />
             <span>Client Accounts & SaaS Invoicing Portal</span>
           </h2>
           <p className="text-xs text-slate-500 font-mono">
@@ -82,7 +82,7 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
               onClick={() => exportInvoiceToPDF(selectedInvoice, currentTenant)}
               className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition-colors"
             >
-              <Printer className="h-3.5 w-3.5 text-blue-600" />
+              <Printer className="h-3.5 w-3.5 text-slate-600" />
               <span>Download Invoice PDF</span>
             </button>
           )}
@@ -94,7 +94,7 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
         <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
             <span>Client Organization</span>
-            <Building2 className="h-4 w-4 text-blue-600" />
+            <Building2 className="h-4 w-4 text-slate-600" />
           </div>
           <div className="mt-1 text-lg font-bold text-slate-900 truncate">{currentTenant.name}</div>
           <div className="text-[10px] text-slate-400 font-mono mt-0.5">{currentTenant.code} • {currentTenant.industry}</div>
@@ -103,18 +103,18 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
         <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
             <span>Active Subscription Tier</span>
-            <Shield className="h-4 w-4 text-emerald-600" />
+            <Shield className="h-4 w-4 text-slate-600" />
           </div>
-          <div className="mt-1 text-lg font-bold text-emerald-700 truncate">{currentTenant.plan}</div>
+          <div className="mt-1 text-lg font-bold text-slate-700 truncate">{currentTenant.plan}</div>
           <div className="text-[10px] text-slate-400 font-mono mt-0.5">PSIRA Grade A/B Certified</div>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
             <span>Covered Facilities</span>
-            <Briefcase className="h-4 w-4 text-indigo-600" />
+            <Briefcase className="h-4 w-4 text-slate-600" />
           </div>
-          <div className="mt-1 text-xl font-bold font-mono text-indigo-700">
+          <div className="mt-1 text-xl font-bold font-mono text-slate-700">
             {(sites || []).filter((s) => s.tenantId === currentTenant?.id).length || (sites || []).length} Sites
           </div>
           <div className="text-[10px] text-slate-400 font-mono mt-0.5">24/7 Security Coverage</div>
@@ -177,7 +177,7 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
               >
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-xs text-slate-900">{plan.title}</span>
-                  <span className="font-mono text-xs font-bold text-blue-700">{formatCurrency(plan.price, currentTenant, { maximumFractionDigits: 0 })}/mo</span>
+                  <span className="font-mono text-xs font-bold text-slate-700">{formatCurrency(plan.price, currentTenant, { maximumFractionDigits: 0 })}/mo</span>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1">{plan.desc}</p>
               </div>
@@ -194,11 +194,11 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
                     type="checkbox"
                     checked={addonK9}
                     onChange={(e) => setAddonK9(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 bg-white text-blue-600"
+                    className="h-4 w-4 rounded border-slate-300 bg-white text-slate-600"
                   />
                   <span>🐕 Certified K9 Explosives / Narcotics Unit</span>
                 </span>
-                <span className="font-mono text-blue-700 font-bold">+{formatCurrency(48500, currentTenant, { maximumFractionDigits: 0 })}</span>
+                <span className="font-mono text-slate-700 font-bold">+{formatCurrency(48500, currentTenant, { maximumFractionDigits: 0 })}</span>
               </label>
 
               <label className="flex items-center justify-between rounded-lg bg-slate-50 p-2 border border-slate-200 cursor-pointer">
@@ -207,11 +207,11 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
                     type="checkbox"
                     checked={addonCruiser}
                     onChange={(e) => setAddonCruiser(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 bg-white text-blue-600"
+                    className="h-4 w-4 rounded border-slate-300 bg-white text-slate-600"
                   />
                   <span>🚓 Armed Reaction Cruiser Unit</span>
                 </span>
-                <span className="font-mono text-blue-700 font-bold">+{formatCurrency(38500, currentTenant, { maximumFractionDigits: 0 })}</span>
+                <span className="font-mono text-slate-700 font-bold">+{formatCurrency(38500, currentTenant, { maximumFractionDigits: 0 })}</span>
               </label>
 
               <label className="flex items-center justify-between rounded-lg bg-slate-50 p-2 border border-slate-200 cursor-pointer">
@@ -220,11 +220,11 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
                     type="checkbox"
                     checked={addonPoliceSLA}
                     onChange={(e) => setAddonPoliceSLA(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 bg-white text-blue-600"
+                    className="h-4 w-4 rounded border-slate-300 bg-white text-slate-600"
                   />
                   <span>⚡ Priority SAPS 10111 CAD Link</span>
                 </span>
-                <span className="font-mono text-blue-700 font-bold">+{formatCurrency(22000, currentTenant, { maximumFractionDigits: 0 })}</span>
+                <span className="font-mono text-slate-700 font-bold">+{formatCurrency(22000, currentTenant, { maximumFractionDigits: 0 })}</span>
               </label>
 
               <label className="flex items-center justify-between rounded-lg bg-slate-50 p-2 border border-slate-200 cursor-pointer">
@@ -233,18 +233,18 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
                     type="checkbox"
                     checked={addonDrone}
                     onChange={(e) => setAddonDrone(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 bg-white text-blue-600"
+                    className="h-4 w-4 rounded border-slate-300 bg-white text-slate-600"
                   />
                   <span>🛸 Autonomous Perimeter Thermal Drone Sweeps</span>
                 </span>
-                <span className="font-mono text-blue-700 font-bold">+{formatCurrency(35000, currentTenant, { maximumFractionDigits: 0 })}</span>
+                <span className="font-mono text-slate-700 font-bold">+{formatCurrency(35000, currentTenant, { maximumFractionDigits: 0 })}</span>
               </label>
             </div>
           </div>
 
           <div className="pt-2 border-t border-slate-200 flex items-center justify-between font-mono">
             <span className="text-xs text-slate-600 font-semibold">Estimated Total:</span>
-            <span className="text-base font-bold text-emerald-700">{formatCurrency(estimatedMonthly, currentTenant, { maximumFractionDigits: 0 })}/mo</span>
+            <span className="text-base font-bold text-slate-700">{formatCurrency(estimatedMonthly, currentTenant, { maximumFractionDigits: 0 })}/mo</span>
           </div>
         </div>
 
@@ -253,7 +253,7 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
           <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white p-5 space-y-4 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div>
-                <span className="text-xs font-mono font-bold text-blue-700">
+                <span className="text-xs font-mono font-bold text-slate-700">
                   {selectedInvoice.invoiceNumber}
                 </span>
                 <h3 className="text-base font-bold text-slate-900 mt-0.5">{selectedInvoice.tenantName}</h3>
@@ -264,7 +264,7 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
                 <span
                   className={`rounded-md px-2.5 py-1 text-xs font-mono font-bold uppercase ${
                     selectedInvoice.status === 'Paid'
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      ? 'bg-emerald-50 text-slate-800 border border-emerald-200'
                       : 'bg-amber-50 text-amber-800 border border-amber-200'
                   }`}
                 >
@@ -315,7 +315,7 @@ export const ClientBillingPortal: React.FC<ClientBillingPortalProps> = ({
                     {formatCurrency(selectedInvoice.tax, currentTenant)}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm font-bold text-blue-700 pt-1.5 border-t border-slate-200">
+                <div className="flex justify-between text-sm font-bold text-slate-700 pt-1.5 border-t border-slate-200">
                   <span>Total Amount Due:</span>
                   <span>{formatCurrency(selectedInvoice.total, currentTenant)}</span>
                 </div>

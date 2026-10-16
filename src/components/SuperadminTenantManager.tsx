@@ -185,10 +185,10 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
               className={`flex h-7 w-7 items-center justify-center rounded-lg font-bold border ${
                 isSuperadmin
                   ? 'bg-amber-100 text-amber-800 border-amber-300'
-                  : 'bg-blue-100 text-blue-800 border-blue-300'
+                  : 'bg-blue-100 text-slate-800 border-blue-300'
               }`}
             >
-              {isSuperadmin ? <Crown className="h-4 w-4 text-amber-700" /> : <Shield className="h-4 w-4 text-blue-700" />}
+              {isSuperadmin ? <Crown className="h-4 w-4 text-amber-700" /> : <Shield className="h-4 w-4 text-slate-700" />}
             </span>
             <h2 className="text-lg font-bold text-slate-900 tracking-tight">
               {isSuperadmin
@@ -199,7 +199,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
               className={`rounded px-2 py-0.5 text-[10px] font-mono font-bold border ${
                 isSuperadmin
                   ? 'bg-amber-100 text-amber-800 border-amber-200'
-                  : 'bg-blue-100 text-blue-800 border-blue-200'
+                  : 'bg-blue-100 text-slate-800 border-blue-200'
               }`}
             >
               {isSuperadmin ? 'GLOBAL SOC SUPERADMIN' : `TENANT CODE: ${currentTenant.code}`}
@@ -234,7 +234,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
               }}
               className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 shadow-xs transition-colors"
             >
-              <Plus className="h-4 w-4 text-blue-600" />
+              <Plus className="h-4 w-4 text-slate-600" />
               <span>Register New Tenant Org</span>
             </button>
           )}
@@ -248,27 +248,27 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
               <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
                 <span>Client Tenants</span>
-                <Building2 className="h-4 w-4 text-blue-600" />
+                <Building2 className="h-4 w-4 text-slate-600" />
               </div>
               <div className="mt-1 text-2xl font-bold font-mono text-slate-900">{tenants.length}</div>
-              <div className="text-[10px] text-emerald-600 font-mono mt-0.5 font-bold">● 100% Active SLA</div>
+              <div className="text-[10px] text-slate-600 font-mono mt-0.5 font-bold">● 100% Active SLA</div>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
               <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
                 <span>Tenant Admins & Users</span>
-                <Users className="h-4 w-4 text-blue-700" />
+                <Users className="h-4 w-4 text-slate-700" />
               </div>
-              <div className="mt-1 text-2xl font-bold font-mono text-blue-800">{users.length}</div>
+              <div className="mt-1 text-2xl font-bold font-mono text-slate-800">{users.length}</div>
               <div className="text-[10px] text-slate-500 font-mono mt-0.5">{totalAdminsCount} Administrators</div>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
               <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
                 <span>Global Guard Force</span>
-                <Shield className="h-4 w-4 text-emerald-600" />
+                <Shield className="h-4 w-4 text-slate-600" />
               </div>
-              <div className="mt-1 text-2xl font-bold font-mono text-emerald-700">{totalGuardsCount} Officers</div>
+              <div className="mt-1 text-2xl font-bold font-mono text-slate-700">{totalGuardsCount} Officers</div>
               <div className="text-[10px] text-slate-500 font-mono mt-0.5">{totalSitesCount} Facilities Monitored</div>
             </div>
 
@@ -288,27 +288,27 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
               <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
                 <span>Organization Users</span>
-                <Users className="h-4 w-4 text-blue-600" />
+                <Users className="h-4 w-4 text-slate-600" />
               </div>
               <div className="mt-1 text-2xl font-bold font-mono text-slate-900">{tenantUsers.length} Users</div>
-              <div className="text-[10px] text-emerald-600 font-mono mt-0.5 font-bold">Active in {currentTenant.code}</div>
+              <div className="text-[10px] text-slate-600 font-mono mt-0.5 font-bold">Active in {currentTenant.code}</div>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
               <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
                 <span>Operating Facilities</span>
-                <Building2 className="h-4 w-4 text-blue-700" />
+                <Building2 className="h-4 w-4 text-slate-700" />
               </div>
-              <div className="mt-1 text-2xl font-bold font-mono text-blue-800">{tenantSites.length} Sites</div>
+              <div className="mt-1 text-2xl font-bold font-mono text-slate-800">{tenantSites.length} Sites</div>
               <div className="text-[10px] text-slate-500 font-mono mt-0.5">Under Security Coverage</div>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-2xs">
               <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 uppercase font-semibold">
                 <span>Guard Roster</span>
-                <Shield className="h-4 w-4 text-emerald-600" />
+                <Shield className="h-4 w-4 text-slate-600" />
               </div>
-              <div className="mt-1 text-2xl font-bold font-mono text-emerald-700">{tenantGuards.length} Officers</div>
+              <div className="mt-1 text-2xl font-bold font-mono text-slate-700">{tenantGuards.length} Officers</div>
               <div className="text-[10px] text-slate-500 font-mono mt-0.5">Active on Shift / Patrol</div>
             </div>
 
@@ -334,7 +334,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
               onClick={() => setActiveSubTab('tenants')}
               className={`flex items-center gap-2 border-b-2 px-3 py-2 text-xs font-bold transition-colors ${
                 activeSubTab === 'tenants'
-                  ? 'border-blue-600 text-blue-900'
+                  ? 'border-blue-600 text-slate-900'
                   : 'border-transparent text-slate-500 hover:text-slate-900'
               }`}
             >
@@ -347,7 +347,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
             onClick={() => setActiveSubTab('admins')}
             className={`flex items-center gap-2 border-b-2 px-3 py-2 text-xs font-bold transition-colors ${
               activeSubTab === 'admins'
-                ? 'border-blue-600 text-blue-900'
+                ? 'border-blue-600 text-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -423,18 +423,18 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                         <div className="flex items-center gap-2">
                           <h3 className="font-bold text-slate-900 text-sm">{t.name}</h3>
                           {isCurrent && (
-                            <span className="rounded bg-blue-100 text-blue-800 text-[9px] font-mono px-1.5 py-0.2 font-bold">
+                            <span className="rounded bg-blue-100 text-slate-800 text-[9px] font-mono px-1.5 py-0.2 font-bold">
                               ACTIVE CONTEXT
                             </span>
                           )}
                         </div>
                         <div className="text-xs text-slate-500 font-mono">
-                          Code: <strong className="text-blue-700">{t.code}</strong> • {t.industry}
+                          Code: <strong className="text-slate-700">{t.code}</strong> • {t.industry}
                         </div>
                       </div>
                     </div>
 
-                    <span className="rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono font-bold px-2 py-0.5">
+                    <span className="rounded-full bg-emerald-50 text-slate-700 border border-emerald-200 text-[10px] font-mono font-bold px-2 py-0.5">
                       {t.status || 'ACTIVE'}
                     </span>
                   </div>
@@ -451,14 +451,14 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                     </div>
                     <div>
                       <div className="text-[10px] text-slate-500">MONTHLY BILL</div>
-                      <div className="text-sm font-bold text-emerald-700">{formatCurrency(t.monthlySpend || 25000, t, { maximumFractionDigits: 0 })}</div>
+                      <div className="text-sm font-bold text-slate-700">{formatCurrency(t.monthlySpend || 25000, t, { maximumFractionDigits: 0 })}</div>
                     </div>
                   </div>
 
                   {/* Primary Admin Details */}
                   <div className="mt-3.5 rounded-xl border border-slate-100 bg-slate-50/70 p-3">
                     <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1.5">
-                      <span className="flex items-center gap-1.5 text-blue-800 font-mono">
+                      <span className="flex items-center gap-1.5 text-slate-800 font-mono">
                         <Users className="h-3.5 w-3.5" />
                         PRIMARY TENANT ADMINISTRATOR
                       </span>
@@ -493,7 +493,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                   <div className="mt-4 flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
                     <button
                       onClick={() => onOpenNewAdminModal(t)}
-                      className="text-xs font-semibold text-slate-600 hover:text-blue-600 flex items-center gap-1"
+                      className="text-xs font-semibold text-slate-600 hover:text-slate-600 flex items-center gap-1"
                     >
                       <UserPlus className="h-3.5 w-3.5" />
                       <span>Add User to Tenant</span>
@@ -506,7 +506,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                       }}
                       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
                         isCurrent
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          ? 'bg-blue-50 text-slate-700 border border-blue-200'
                           : 'bg-slate-900 text-white hover:bg-slate-800'
                       }`}
                     >
@@ -578,7 +578,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                             <div className="font-bold text-slate-900 flex items-center gap-1.5">
                               {u.name}
                               {isCurrent && (
-                                <span className="text-[9px] bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-mono font-bold">
+                                <span className="text-[9px] bg-blue-100 text-slate-800 px-1.5 py-0.2 rounded font-mono font-bold">
                                   YOU
                                 </span>
                               )}
@@ -604,11 +604,11 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                             u.role === 'SUPERADMIN'
                               ? 'bg-amber-100 text-amber-900 border border-amber-300'
                               : u.role === 'TENANT_ADMIN'
-                              ? 'bg-blue-100 text-blue-900 border border-blue-200'
+                              ? 'bg-blue-100 text-slate-900 border border-blue-200'
                               : u.role === 'SUPERVISOR'
-                              ? 'bg-blue-100 text-blue-900 border border-blue-200'
+                              ? 'bg-blue-100 text-slate-900 border border-blue-200'
                               : u.role === 'DISPATCHER'
-                              ? 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                              ? 'bg-emerald-100 text-slate-900 border border-emerald-200'
                               : 'bg-slate-100 text-slate-700'
                           }`}
                         >
@@ -624,7 +624,7 @@ export const SuperadminTenantManager: React.FC<SuperadminTenantManagerProps> = (
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-mono font-bold border ${
                           u.status === 'SUSPENDED'
                             ? 'bg-slate-100 text-slate-700 border-slate-300'
-                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-emerald-50 text-slate-700 border-emerald-200'
                         }`}>
                           <span className={`h-1.5 w-1.5 rounded-full ${u.status === 'SUSPENDED' ? 'bg-slate-500' : 'bg-emerald-500'}`}></span>
                           {u.status}

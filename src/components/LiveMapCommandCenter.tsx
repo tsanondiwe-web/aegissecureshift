@@ -368,7 +368,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
               }}
               className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-900 transition-colors hover:border-slate-400 hover:bg-slate-50"
             >
-              <QrCode className="h-3.5 w-3.5 text-blue-600" />
+              <QrCode className="h-3.5 w-3.5 text-slate-600" />
               <span>Scan QR</span>
             </button>
 
@@ -399,7 +399,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                   onClick={() => setShowGeofences(!showGeofences)}
                   className={`h-7 px-2 rounded-lg border text-[10px] font-mono font-bold shadow-2xs ${
                     showGeofences
-                      ? 'border-blue-300 text-blue-700 bg-blue-50'
+                      ? 'border-blue-300 text-slate-700 bg-blue-50'
                       : 'border-slate-200 text-slate-400 bg-white'
                   }`}
                 >
@@ -409,7 +409,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                   onClick={() => setShowCheckpoints(!showCheckpoints)}
                   className={`h-7 px-2 rounded-lg border text-[10px] font-mono font-bold shadow-2xs ${
                     showCheckpoints
-                      ? 'border-blue-300 text-blue-700 bg-blue-50'
+                      ? 'border-blue-300 text-slate-700 bg-blue-50'
                       : 'border-slate-200 text-slate-400 bg-white'
                   }`}
                 >
@@ -419,7 +419,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                   onClick={() => setShowBreadcrumbs(!showBreadcrumbs)}
                   className={`h-7 px-2 rounded-lg border text-[10px] font-mono font-bold shadow-2xs ${
                     showBreadcrumbs
-                      ? 'border-blue-300 text-blue-700 bg-blue-50'
+                      ? 'border-blue-300 text-slate-700 bg-blue-50'
                       : 'border-slate-200 text-slate-400 bg-white'
                   }`}
                 >
@@ -632,12 +632,12 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
             {/* Quick SADC / SA Multi-Region HUD Bar at Bottom */}
             <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
               <div className="flex items-center gap-3 rounded-xl bg-slate-900/90 border border-slate-700 p-2.5 backdrop-blur-md text-xs font-mono text-slate-200 shadow-xl pointer-events-auto">
-                <span className="flex items-center gap-1.5 font-bold text-blue-400">
+                <span className="flex items-center gap-1.5 font-bold text-slate-400">
                   <Landmark className="h-4 w-4" />
                   <span>SADC & METROPOLITAN REGIONS: {sites.length} SITES ACTIVE</span>
                 </span>
                 <span className="text-slate-600">|</span>
-                <span className="text-emerald-400 font-semibold">
+                <span className="text-slate-400 font-semibold">
                   {guards.length} PSIRA Registered Officers Deployed
                 </span>
                 <span className="text-slate-600">|</span>
@@ -650,7 +650,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
               {(hoveredSite || currentSite) && (
                 <div className="flex items-center gap-3 rounded-xl bg-slate-900 border border-blue-500/50 p-2 text-xs font-mono text-white shadow-2xl pointer-events-auto">
                   <div>
-                    <div className="font-bold text-blue-300">
+                    <div className="font-bold text-slate-300">
                       {(hoveredSite || currentSite).name}
                     </div>
                     <div className="text-[10px] text-slate-400">
@@ -1067,8 +1067,8 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
             {/* Quick HUD Overlay at Bottom of Map */}
             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none">
               <div className="flex items-center gap-2 rounded-xl bg-white/95 border border-slate-200 p-2.5 backdrop-blur-md text-xs font-mono text-slate-700 shadow-md pointer-events-auto">
-                <span className="flex items-center gap-1.5 font-bold text-blue-700">
-                  <QrCode className="h-3.5 w-3.5 text-blue-600" />
+                <span className="flex items-center gap-1.5 font-bold text-slate-700">
+                  <QrCode className="h-3.5 w-3.5 text-slate-600" />
                   <span>QR OPTICAL SCAN POSITIONING ENFORCED</span>
                 </span>
                 <span className="text-slate-300">|</span>
@@ -1087,7 +1087,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
 
               {/* Selected Checkpoint Quick Scan Action Card */}
               {selectedCheckpoint && selectedGuard && (
-                <div className="hidden sm:flex items-center gap-2 rounded-xl bg-white border border-blue-300 p-2 text-xs font-mono text-blue-900 shadow-lg pointer-events-auto">
+                <div className="hidden sm:flex items-center gap-2 rounded-xl bg-white border border-blue-300 p-2 text-xs font-mono text-slate-900 shadow-lg pointer-events-auto">
                   <div>
                     <div className="font-bold text-slate-900">{selectedCheckpoint.name}</div>
                     <div className="text-[10px] text-slate-500 font-mono">Tag: {selectedCheckpoint.qrCodeValue || 'QR-TAG'}</div>
@@ -1114,7 +1114,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
             {/* Search filter for UK locations */}
             <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm space-y-2">
               <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-slate-900">
-                <Landmark className="h-4 w-4 text-blue-600" />
+                <Landmark className="h-4 w-4 text-slate-600" />
                 <span>UK LOCATION & AUTHORITY DIRECTORY</span>
               </div>
               <div className="relative">
@@ -1157,7 +1157,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                         <div>
                           <h5 className="text-xs font-bold text-slate-900">{site.name}</h5>
                           <div className="text-[11px] text-slate-600 font-medium mt-0.5">
-                            <span className="font-bold text-blue-700">{site.townOrCity || site.city}</span>
+                            <span className="font-bold text-slate-700">{site.townOrCity || site.city}</span>
                             {site.district ? ` • ${site.district}` : ''}
                           </div>
                           <div className="text-[10px] text-slate-500 font-mono">
@@ -1174,7 +1174,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                         <span>
                           Officers: <strong>{siteGuardsCount} active</strong>
                         </span>
-                        <span className="text-blue-700 font-bold flex items-center gap-0.5">
+                        <span className="text-slate-700 font-bold flex items-center gap-0.5">
                           <span>Enter Blueprint</span>
                           <ArrowRight className="h-2.5 w-2.5" />
                         </span>
@@ -1188,7 +1188,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
             {/* UK Sovereign Constabulary Directory */}
             <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm space-y-2">
               <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-800">
-                <PhoneCall className="h-3.5 w-3.5 text-blue-600" />
+                <PhoneCall className="h-3.5 w-3.5 text-slate-600" />
                 <span>REGIONAL POLICE CAD / DISPATCH LINKS</span>
               </div>
               <div className="text-[10px] font-mono space-y-1.5 text-slate-600">
@@ -1233,7 +1233,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                     <div>
                       <div className="flex items-center gap-1.5">
                         <h4 className="text-sm font-bold text-slate-900">{selectedGuard.name}</h4>
-                        <span className="rounded bg-blue-50 px-1.5 py-0.2 text-[9px] font-mono text-blue-700 border border-blue-200 font-bold">
+                        <span className="rounded bg-blue-50 px-1.5 py-0.2 text-[9px] font-mono text-slate-700 border border-blue-200 font-bold">
                           {selectedGuard.badgeNumber}
                         </span>
                       </div>
@@ -1245,11 +1245,11 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                   <span
                     className={`rounded-full px-2.5 py-1 text-[10px] font-medium capitalize ${
                       selectedGuard.status === 'patrolling'
-                        ? 'bg-blue-50 text-blue-800 border border-blue-200'
+                        ? 'bg-blue-50 text-slate-800 border border-blue-200'
                         : selectedGuard.status === 'incident_responding'
                         ? 'bg-rose-600 text-white'
                         : selectedGuard.status === 'on_duty'
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                        ? 'bg-emerald-50 text-slate-800 border border-emerald-200'
                         : 'bg-amber-50 text-amber-800 border border-amber-200'
                     }`}
                   >
@@ -1260,11 +1260,11 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                 {/* QR Scan Tracking Telemetry Card */}
                 <div className="rounded-lg border border-blue-100 bg-blue-50/50 p-3 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-blue-900">
-                      <QrCode className="h-4 w-4 text-blue-600" />
+                    <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-900">
+                      <QrCode className="h-4 w-4 text-slate-600" />
                       <span>Last verified QR scan</span>
                     </span>
-                    <span className="rounded bg-white px-2 py-0.5 text-[10px] font-mono font-bold text-emerald-700 border border-emerald-200">
+                    <span className="rounded bg-white px-2 py-0.5 text-[10px] font-mono font-bold text-slate-700 border border-emerald-200">
                       {selectedGuard.lastScannedTimestamp || 'Active Fix'}
                     </span>
                   </div>
@@ -1294,10 +1294,10 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                 <div className="grid grid-cols-3 divide-x divide-slate-200 py-1 text-center">
                   <div className="px-2">
                     <div className="flex items-center justify-center gap-1 text-[10px] text-slate-400 mb-0.5 font-medium">
-                      <BatteryCharging className="h-3 w-3 text-emerald-600" />
+                      <BatteryCharging className="h-3 w-3 text-slate-600" />
                       <span>Battery</span>
                     </div>
-                    <div className="text-xs font-bold font-mono text-emerald-700">
+                    <div className="text-xs font-bold font-mono text-slate-700">
                       {selectedGuard.batteryLevel}%
                     </div>
                   </div>
@@ -1314,10 +1314,10 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
 
                   <div className="px-2">
                     <div className="flex items-center justify-center gap-1 text-[10px] text-slate-400 mb-0.5 font-medium">
-                      <Wifi className="h-3 w-3 text-blue-600" />
+                      <Wifi className="h-3 w-3 text-slate-600" />
                       <span>Signal</span>
                     </div>
-                    <div className="text-xs font-bold font-mono text-blue-700">
+                    <div className="text-xs font-bold font-mono text-slate-700">
                       {selectedGuard.signalType}
                     </div>
                   </div>
@@ -1330,7 +1330,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                       <Video className="h-3.5 w-3.5 text-rose-600" />
                       <span>Body camera</span>
                     </span>
-                    <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1 rounded border border-emerald-200">
+                    <span className="text-[10px] text-slate-700 font-bold bg-emerald-50 px-1 rounded border border-emerald-200">
                       1080p 60FPS
                     </span>
                   </div>
@@ -1355,7 +1355,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
                     }}
                     className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 py-2 text-xs font-bold text-slate-700 shadow-2xs transition-colors"
                   >
-                    <Radio className="h-3.5 w-3.5 text-blue-600" />
+                    <Radio className="h-3.5 w-3.5 text-slate-600" />
                     <span>Radio Channel</span>
                   </button>
 
@@ -1401,7 +1401,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
             {showOperationalDetails && <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm space-y-2">
               <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
                 <span className="text-[11px] font-mono font-bold text-slate-800 flex items-center gap-1">
-                  <PhoneCall className="h-3.5 w-3.5 text-emerald-600" />
+                  <PhoneCall className="h-3.5 w-3.5 text-slate-600" />
                   <span>Local dispatch</span>
                 </span>
                 <span className="text-[10px] font-mono text-slate-500">{currentSite.postcode}</span>
@@ -1411,7 +1411,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
               </div>
               <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
                 <span>Emergency Contact:</span>
-                <span className="font-bold text-blue-700">{currentSite.emergencyContact.phone}</span>
+                <span className="font-bold text-slate-700">{currentSite.emergencyContact.phone}</span>
               </div>
             </div>}
 
@@ -1419,7 +1419,7 @@ export const LiveMapCommandCenter: React.FC<LiveMapProps> = ({
             <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm flex-1 flex flex-col min-h-0">
               <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
                 <div className="flex items-center gap-1.5">
-                  <UserCheck className="h-3.5 w-3.5 text-blue-600" />
+                  <UserCheck className="h-3.5 w-3.5 text-slate-600" />
                   <span className="text-xs font-mono font-bold text-slate-800">
                     Officers ({filteredGuards.length})
                   </span>

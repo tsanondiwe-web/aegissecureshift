@@ -95,7 +95,7 @@ export const ShiftScheduler: React.FC<ShiftSchedulerProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
           <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <CalendarCheck className="h-5 w-5 text-blue-600" />
+            <CalendarCheck className="h-5 w-5 text-slate-600" />
             <span>Scheduling, Shift Roster & Geofenced Time Clock</span>
           </h2>
           <p className="text-xs text-slate-500 font-mono">
@@ -212,7 +212,7 @@ export const ShiftScheduler: React.FC<ShiftSchedulerProps> = ({
                   <span
                     className={`rounded-md px-2 py-0.5 text-[9px] font-mono font-bold uppercase ${
                       shift.status === 'Clocked In'
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                        ? 'bg-emerald-50 text-slate-800 border border-emerald-200'
                         : 'bg-slate-100 text-slate-600'
                     }`}
                   >
@@ -227,13 +227,13 @@ export const ShiftScheduler: React.FC<ShiftSchedulerProps> = ({
                   </div>
                   <div className="flex justify-between text-slate-700 font-mono">
                     <span className="text-slate-500">Shift Window:</span>
-                    <span className="font-bold text-blue-700">
+                    <span className="font-bold text-slate-700">
                       {shift.startTime} – {shift.endTime} ({shift.shiftType})
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-700 font-mono">
                     <span className="text-slate-500">Billing Rate:</span>
-                    <span className="text-emerald-700 font-bold">{formatCurrency(shift.hourlyRate, currentTenant)}/hr</span>
+                    <span className="text-slate-700 font-bold">{formatCurrency(shift.hourlyRate, currentTenant)}/hr</span>
                   </div>
                 </div>
 
@@ -285,7 +285,7 @@ export const ShiftScheduler: React.FC<ShiftSchedulerProps> = ({
                     <td className="p-3 text-slate-800 font-sans font-medium">{att.siteName.split(' (')[0]}</td>
                     <td className="p-3 text-slate-700">
                       <div>
-                        In: <strong className="text-emerald-700">{att.actualIn}</strong> (Sched {att.scheduledIn})
+                        In: <strong className="text-slate-700">{att.actualIn}</strong> (Sched {att.scheduledIn})
                       </div>
                       <div className="text-slate-500">Out: {att.actualOut || 'Active On Duty'}</div>
                     </td>
@@ -293,7 +293,7 @@ export const ShiftScheduler: React.FC<ShiftSchedulerProps> = ({
                       <span
                         className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold ${
                           att.geofenceStatus === 'Verified Inside'
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            ? 'bg-emerald-50 text-slate-800 border border-emerald-200'
                             : 'bg-rose-50 text-rose-800 border border-rose-200'
                         }`}
                       >
@@ -316,7 +316,7 @@ export const ShiftScheduler: React.FC<ShiftSchedulerProps> = ({
                     </td>
                     <td className="p-3 text-right">
                       {att.status === 'Approved' ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-700 font-bold text-[11px]">
+                        <span className="inline-flex items-center gap-1 text-slate-700 font-bold text-[11px]">
                           <CheckCircle2 className="h-3.5 w-3.5" /> Approved
                         </span>
                       ) : (
